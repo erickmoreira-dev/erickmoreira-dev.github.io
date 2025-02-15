@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Erick M – Site Pessoal</title>
+    <meta
+      name="description"
+      content="Meu nome é Erick M, sou Desenvolvedor Fullstack e engenheiro de software. Tenho paixão por tudo relacionado à tecnologia, desde engenharia de software e machine learning até UI/UX e gráficos 3D."
+    />
+
+    <link rel="icon" type="image/png" href="/icon/32x32.png" />
+
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover"
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon/180x180.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-title"
+      content="Erick M – Personal Website"
+    />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#f6d4b1" />
+
+    <meta property="og:title" content="Erick M – Personal Website" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://edh.dev/" />
+    <meta property="og:image" content="https://edh.dev/icon/og-img1.png" />
+    <meta
+      name="og:description"
+      content="My name is Erick M, I'm a Fullstack Developer and software engineer. I have a passion for all things technology, from software engineering & machine learning to UI/UX & 3D graphics."
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+
+  <body>
+    <div id="home"></div>
+
+    <canvas class="webgl"></canvas>
+
+    <div id="hero-backup">
+      <h3>Olá, eu sou</h3>
+      <h1>Erick M</h1>
+      <ul>
+        <li>Engenheiro de Software</li>
+        <li>Desenvolvedor Fullstack</li>
+      </ul>
+    </div>
+
+    <nav>
+      <div class="menu-btn">
+        <button class="btn" onclick="toggleMenu()">
+          <svg width="16" height="16">
+            <rect class="st0" width="16" height="3.2" />
+            <rect y="6.4" class="st0" width="16" height="3.2" />
+            <rect y="12.8" class="st0" width="16" height="3.2" />
+          </svg>
+        </button>
+        <div style="display: flex">
+          <a
+            class="btn"
+            href="https://www.linkedin.com/in/erick-moreira-112b3819b/"
+            target="_blank"
+          >
+            <svg width="16" height="16">
+              <path
+                d="M0.1,2c0-1,0.8-1.8,1.9-1.8c1,0,1.8,0.9,1.8,1.8c0,1-0.8,1.9-1.8,1.9C0.9,3.9,0.1,3.1,0.1,2z M0.1,5h3.7v9.8
+                H0.1V5z"
+              />
+              <path
+                d="M15.9,8.5v6.2h-3.5V9.4c0-0.9-0.6-1.6-1.5-1.6c-0.8,0-1.4,0.6-1.4,1.5v5.5H5.8V5h3.7v1
+                c0.6-0.7,1.6-1.2,2.8-1.2C14.4,4.7,15.9,6.3,15.9,8.5z"
+              />
+            </svg>
+          </a>
+          <a
+            class="btn"
+            href="mailto:erick.moreira@alunos.ifsuldeminas.edu.br"
+            target="_blank"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+          </a>
+          <a
+            class="btn"
+            href="https://github.com/heryckmp"
+            target="_blank"
+          >
+            <svg width="16" height="16">
+              <path
+                d="M10.6,12.9c0-1-0.3-1.6-0.7-2c2.4-0.3,4.9-1.1,4.9-5.2c0-1.1-0.4-2.1-1.1-2.9c0.1-0.3,0.5-1.3-0.1-2.8
+                c0,0-0.9-0.3-3,1.1c-1.7-0.5-3.6-0.5-5.4,0c-2-1.4-3-1.1-3-1.1C1.6,1.4,2,2.5,2.1,2.8C1.4,3.5,1,4.6,1,5.6c0,4.1,2.5,5,4.9,5.3
+                c-0.4,0.4-0.6,0.9-0.7,1.4c-0.6,0.3-2.2,0.7-3.1-0.9c0,0-0.6-1-1.6-1.1c0,0-1.1,0-0.1,0.7c0,0,0.7,0.3,1.1,1.6c0,0,0.6,2.1,3.6,1.5
+                c0,0.9,0,1.8,0,1.8h5.3C10.6,15.9,10.6,14.4,10.6,12.9z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="menu-body" onclick="closeMenu()">
+        <a href="#home" onclick="closeMenu()">Início</a>
+        <a href="#aboutMe" onclick="closeMenu()">Sobre</a>
+        <a href="#projects" onclick="closeMenu()">Projetos</a>
+        <a href="#contact" onclick="closeMenu()">Contato</a>
+      </div>
+
+      <div id="tip-scroll">Scroll &#8595;</div>
+    </nav>
+
+    <main>
+      <section>
+        <h1 id="aboutMe">Olá</h1>
+        <p>
+          Meu nome é Erick M, sou Desenvolvedor Fullstack e engenheiro de software. Tenho paixão por tudo
+          relacionado à tecnologia, desde engenharia de software e machine learning até UI/UX e gráficos 3D.
+        </p>
+        <p>
+          Além do meu amor por tecnologia e design, também me interesso
+          por educação e história.
+        </p>
+
+        <p>
+          Abaixo estão os detalhes de alguns dos projetos que desenvolvi ao longo dos meus
+          mais de quinze anos de experiência em programação.
+        </p>
+      </section>
+
+      <section>
+        <h1 id="projects">Projetos</h1>
+        <hr />
+        <h2>OneG8 Bank</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>React</li>
+          <li>TypeScript</li>
+          <li>Node.js</li>
+          <li>PostgreSQL</li>
+          <li>Docker</li>
+          <li>AWS</li>
+        </ul>
+        <p>
+          OneG8 é uma solução bancária moderna que oferece uma experiência digital bancária perfeita. A plataforma possui uma interface limpa e intuitiva para gerenciamento de contas, transações em tempo real e autenticação segura. Construída com uma arquitetura de microsserviços, inclui recursos como transferências instantâneas, histórico de transações e análise de contas.
+        </p>
+        <p>
+          O nome do projeto "OneG8" foi inspirado no meu grupo do programa Oracle ONE (Oracle Next Education) - Grupo 8.
+        </p>
+        <p><a href="https://bank-one-g8.vercel.app" target="_blank">bank-one-g8.vercel.app</a></p>
+        <br />
+        <div class="image">
+          <img
+            src="/src/img/oneg8-1.webp"
+            width="100%"
+            alt="OneG8 Bank screenshot"
+            loading="lazy"
+            style="aspect-ratio: 16 / 9"
+          />
+          <video width="100%" controls loop autoplay>
+            <source src="/src/img/bankg8.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <hr />
+        <h2>CloudNest</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>Next.js</li>
+          <li>React</li>
+          <li>TypeScript</li>
+          <li>TailwindCSS</li>
+          <li>Appwrite</li>
+          <li>Hugging Face AI</li>
+        </ul>
+        <p>
+          CloudNest é uma plataforma moderna de gerenciamento de armazenamento que revoluciona a forma como os usuários interagem com seu conteúdo digital. Construída com as mais recentes tecnologias web, oferece uma experiência segura, intuitiva e descomplicada para gerenciar e compartilhar arquivos na nuvem.
+        </p>
+        <p>
+          A plataforma possui gerenciamento inteligente de arquivos com organização baseada em IA, monitoramento de armazenamento em tempo real, recursos avançados de pesquisa e compartilhamento seguro de arquivos. Inclui recursos como upload por arrastar e soltar, visualização de arquivos e um assistente de IA integrado para melhor interação do usuário.
+        </p>
+        <p><a href="https://cloud-nest-gray.vercel.app" target="_blank">cloud-nest-gray.vercel.app</a></p>
+        <br />
+        <div class="image">
+          <img
+            src="/src/img/cloudnest.png"
+            width="100%"
+            alt="CloudNest screenshot"
+            loading="lazy"
+            style="aspect-ratio: 16 / 9"
+          />
+          <video width="100%" controls loop autoplay>
+            <source src="/src/img/cloudnest.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <hr />
+        <h2>ClimateAPP</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>Next.js 14</li>
+          <li>React 18</li>
+          <li>TypeScript</li>
+          <li>Tailwind CSS</li>
+          <li>Three.js</li>
+          <li>React-Globe.GL</li>
+          <li>Leaflet</li>
+        </ul>
+        <p>
+          ClimateAPP é uma aplicação web moderna para consulta de previsão do tempo, desenvolvida com Next.js e TypeScript. O aplicativo oferece uma interface intuitiva e elegante com efeitos visuais dinâmicos que representam as condições climáticas em tempo real.
+        </p>
+        <p>
+          O aplicativo inclui recursos avançados como busca de cidades com autocompletar, previsão para os próximos 7 dias, detalhes meteorológicos completos, alertas de condições climáticas severas, efeitos visuais dinâmicos baseados no clima, e um globo terrestre 3D interativo com visualização da localização do usuário em tempo real.
+        </p>
+        <p><a href="https://climate-app-five.vercel.app" target="_blank">climate-app-five.vercel.app</a></p>
+        <br />
+        <div class="image">
+          <img
+            src="/src/img/climateapp.png"
+            width="100%"
+            alt="ClimateAPP screenshot"
+            loading="lazy"
+            style="aspect-ratio: 16 / 9"
+          />
+          <video width="100%" controls loop autoplay>
+            <source src="/src/img/climateapp.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <hr />
+        <h2>Project L</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>VR</li>
+          <li>Game Dev</li>
+          <li>Design</li>
+          <li>3D</li>
+        </ul>
+        <p>
+          Ao longo dos anos, criei muitos jogos, com a captura de tela abaixo
+          representando um deles de 2025. Provavelmente um dos jogos
+          tecnicamente mais desafiadores que criei, era um sandbox de mundo aberto em VR
+          desenvolvido em Unity, onde você podia interagir, mover, rotacionar e
+          redimensionar os objetos no mundo para construir qualquer coisa que desejasse.
+        </p>
+        <div class="image">
+          <img
+            src="/src/img/sc3.png"
+            width="100%"
+            alt="Project L screenshot"
+            style="aspect-ratio: 1439 / 896"
+          />
+          <img
+            src="/src/img/sc1.png"
+            width="100%"
+            alt="Project L screenshot"
+            loading="lazy"
+            style="aspect-ratio: 1439 / 896"
+          />
+          <img
+            src="/src/img/sc2.png"
+            width="100%"
+            alt="Project L screenshot"
+            loading="lazy"
+            style="aspect-ratio: 1439 / 896"
+          />
+        </div>
+        <hr />
+        <h2>EnglishAISpeak</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>Next.js 13+</li>
+          <li>TypeScript</li>
+          <li>TailwindCSS</li>
+          <li>FastAPI</li>
+          <li>PostgreSQL</li>
+          <li>Python</li>
+          <li>LM Studio</li>
+          <li>AI</li>
+        </ul>
+        <p>
+          Um aplicativo web moderno para treinamento de inglês usando Inteligência Artificial local através do LM Studio. O projeto oferece uma experiência completa de aprendizado com recursos como conversação em inglês com IA, correções em tempo real, assistente de escrita, prática de pronúncia e acompanhamento de progresso.
+        </p>
+        <p>
+          O aplicativo utiliza modelos de linguagem locais como DeepSeek R1, Mistral e Llama 2 para garantir privacidade dos dados e baixa latência. Inclui recursos avançados como análise detalhada de textos, avaliação fonética, feedback personalizado e um sistema de conquistas para manter os usuários engajados.
+        </p>
+        <p><a href="https://englishiaspeak.vercel.app" target="_blank">englishiaspeak.vercel.app</a></p>
+        <br />
+        <div class="image">
+          <img
+            src="/src/img/treinadoringles.png"
+            width="100%"
+            alt="EnglishAISpeak screenshot"
+            loading="lazy"
+            style="aspect-ratio: 16 / 9"
+          />
+          <video width="100%" controls loop autoplay>
+            <source src="/src/img/english.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <hr />
+        <h2>Amigo Secreto</h2>
+        <h3>2025</h3>
+        <ul class="skills">
+          <li>HTML5</li>
+          <li>CSS3</li>
+          <li>JavaScript</li>
+          <li>Speech Synthesis API</li>
+          <li>Web Dev</li>
+          <li>UI/UX</li>
+        </ul>
+        <p>
+          Este é um projeto simples de "Amigo Secreto" com uma interface de usuário para adicionar amigos e realizar o sorteio. Esse projeto faz parte do curso Iniciante em Programação - Turma G8, do programa Oracle Next Education (ONE).
+        </p>
+        <p>
+          O aplicativo inclui recursos como adição e remoção de participantes, validações de entrada, sorteio automático, síntese de fala para leitura dos resultados, e uma interface responsiva e acessível. Implementa validações robustas como tamanho mínimo de nome, verificação de duplicidade, e quantidade mínima de participantes.
+        </p>
+        <p><a href="https://amigo-secreto-one-iota.vercel.app" target="_blank">amigo-secreto-one-iota.vercel.app</a></p>
+        <br />
+        <div class="image">
+          <img
+            src="/src/img/amigo-secret.png"
+            width="100%"
+            alt="Amigo Secreto screenshot"
+            loading="lazy"
+            style="aspect-ratio: 16 / 9"
+          />
+        </div>
+        <hr />
+        <p>
+          Isso representa apenas uma pequena seleção dos projetos em que trabalhei em 2025.
+        </p>
+      </section>
+
+      <section>
+        <h1 id="contact">Contato</h1>
+        <p style="text-align: center">
+          Entre em contato pelo
+          <a href="https://www.linkedin.com/in/erick-moreira-112b3819b/"
+            ><u><b>LinkedIn</b></u></a
+          >
+        </p>
+      </section>
+    </main>
+
+    <input type="text" id="textarea" readonly />
+    <div id="loading">
+      <h2>Booting...</h2>
+      <div id="loading-bar">
+        <div id="loading-bar-progress"></div>
+      </div>
+      <div id="loading-items">Starting...</div>
+    </div>
+    <footer>
+      <p>Design do computador baseado no Commodore PET 8296 - Um computador pessoal clássico de 1981, com monitor monocromático embutido e teclado mecânico. Um dos primeiros designs all-in-one que influenciou a computação moderna.</p>
+      <p>Projetado por Ed H</p>
+      <p>DIREITOS AUTORAIS © 2022-2024 Erick M.</p>
+    </footer>
+    <script>
+      function closeMenu() {
+        document.getElementsByTagName("nav")[0].classList.remove(["active"]);
+      }
+
+      function toggleMenu() {
+        const nav = document.getElementsByTagName("nav")[0];
+        if (nav.classList.contains("active")) {
+          nav.classList.remove(["active"]);
+        } else {
+          nav.classList.add("active");
+        }
+      }
+    </script>
+    <script
+      fetchpriority="high"
+      src="https://cdn-ts.netlify.app/webgl-helper@3.0.11/webgl-helper.min.js"
+    ></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-EDNKHGV4HB"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-EDNKHGV4HB");
+      gtag("event", "origin", { name: window.origin });
+    </script>
+
+    <button onclick="toggleTranslate()" class="translate-btn" id="translate-btn" style="display: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+      </svg>
+      Translate
+    </button>
+
+    <script>
+      // Mostrar botão de tradução depois que sair da tela do PC
+      window.addEventListener('scroll', function() {
+        const computerScreen = document.querySelector('.webgl');
+        const translateBtn = document.getElementById('translate-btn');
+        
+        if (window.scrollY > window.innerHeight) {
+          translateBtn.style.display = 'flex';
+        } else {
+          translateBtn.style.display = 'none';
+        }
+      });
+
+      // Função para alternar o Google Translate
+      function toggleTranslate() {
+        const translateBtn = document.getElementById('translate-btn');
+        
+        if (!window.googleTranslateElementInit) {
+          // Primeira vez que o botão é clicado
+          window.googleTranslateElementInit = function() {
+            new google.translate.TranslateElement({
+              pageLanguage: 'pt',
+              includedLanguages: 'en',
+              layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+          }
+
+          // Adiciona o elemento do Google Translate
+          const div = document.createElement('div');
+          div.id = 'google_translate_element';
+          div.style.position = 'fixed';
+          div.style.bottom = '80px';
+          div.style.right = '20px';
+          div.style.zIndex = '1000';
+          document.body.appendChild(div);
+
+          // Carrega o script do Google Translate
+          const script = document.createElement('script');
+          script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+          document.body.appendChild(script);
+
+          translateBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+            </svg>
+            Translate`;
+        } else {
+          // Remove o widget de tradução
+          const element = document.getElementById('google_translate_element');
+          if (element) element.remove();
+          
+          // Reseta a página para o idioma original
+          const iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+          if (iframe) {
+            iframe.contentWindow.document.getElementsByTagName('button')[0].click();
+          }
+          
+          // Remove a função init
+          delete window.googleTranslateElementInit;
+          
+          translateBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+            </svg>
+            Translate`;
+        }
+      }
+    </script>
+  </body>
+</html>
