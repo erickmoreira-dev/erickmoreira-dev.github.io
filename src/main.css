@@ -223,8 +223,8 @@ hr {
   height: 2px;
   background-color: none;
   margin: auto;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin-top: 80px;
+  margin-bottom: 80px;
   border: none;
   border-bottom: dashed 2px var(--color);
 }
@@ -265,12 +265,12 @@ p {
   flex-wrap: wrap;
   gap: 16px;
   margin: auto;
+  margin-bottom: 40px;
 }
 
 .image * {
   box-sizing: border-box;
   width: clamp(0px, 95vw, 1200px);
-
   box-shadow: 1px 1px 0px #f6d4b1, 6px 6px 0px rgba(82, 82, 82, 0.25);
 }
 
