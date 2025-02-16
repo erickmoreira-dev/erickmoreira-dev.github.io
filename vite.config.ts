@@ -8,6 +8,12 @@ export default defineConfig({
   worker: {},
   build: {
     sourcemap: false,
+    assetsInlineLimit: 0,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
   server: {
     open: true,
