@@ -66,8 +66,104 @@ Try these:
     cat: () => print(ASCII_ART.cat),
     matrix: () => {
       print(SPECIAL_COMMANDS.matrix());
-      document.body.classList.add('matrix-mode');
-      setTimeout(() => document.body.classList.remove('matrix-mode'), 10000);
+      
+      // Create canvas for Matrix effect
+      const canvas = document.createElement('canvas');
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.zIndex = '999';
+      canvas.style.opacity = '0.8';
+      canvas.style.background = 'rgba(0, 0, 0, 0.9)';
+      document.body.appendChild(canvas);
+
+      // Set canvas size
+      const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Matrix characters
+      const chars = 'ｦｱｳｴｵｶｷｹｺｻｼｽｾｿﾀﾂﾃﾅﾆﾇﾈﾊﾋﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ0123456789'.split('');
+      
+      const fontSize = 16;
+      const columns = canvas.width / fontSize;
+      
+      // Array to store drops
+      const drops: number[] = [];
+      
+      // Initialize drops
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -100;
+      }
+
+      // Drawing animation
+      const draw = () => {
+        if (!ctx) return;
+        
+        // Black BG for the canvas, translucent to show trail
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#0F0';
+        ctx.font = fontSize + 'px monospace';
+        
+        // Render drops
+        for (let i = 0; i < drops.length; i++) {
+          // Random character
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          
+          // Draw character
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
+          
+          // Add glow effect
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = '#0F0';
+          
+          // Randomly make some characters brighter for effect
+          if (Math.random() > 0.975) {
+            ctx.fillStyle = '#FFF';
+          } else {
+            ctx.fillStyle = '#0F0';
+          }
+          
+          ctx.fillText(char, x, y);
+          
+          // Reset glow
+          ctx.shadowBlur = 0;
+          
+          // Move drop
+          drops[i]++;
+          
+          // Reset drop if it goes off screen
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+        }
+      };
+
+      // Animation loop
+      let animationId: number;
+      const animate = () => {
+        draw();
+        animationId = requestAnimationFrame(animate);
+      };
+      animate();
+
+      // Remove effect after 10 seconds
+      setTimeout(() => {
+        cancelAnimationFrame(animationId);
+        document.body.removeChild(canvas);
+        window.removeEventListener('resize', resizeCanvas);
+      }, 10000);
     },
     hack: () => print(SPECIAL_COMMANDS.hack()),
     home: () => {
