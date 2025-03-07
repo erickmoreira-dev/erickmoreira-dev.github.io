@@ -1,28 +1,12 @@
 // Easter Eggs e Jogos Retro
 const ASCII_ART = {
-  coffee: `
-    ( (
-     ) )
-  .........
-  |       |]
-  \\       /
-   \`---'
-  COFFEE TIME!
-  `,
-  cat: `
-   /\\___/\\
-  (  o o  )
-  (  =^=  ) 
-   (______)
-  MEOW!
-  `,
   skull: `
    .-""""-.
   /  _  _  \\
   |  o _ o  |
   |  (_)    |
-   \\ '--'  /
-    \`-...-'
+  \\ '--'  /
+   \`-...-'
   GAME OVER!
   `,
   pacman: `
@@ -41,13 +25,15 @@ Initializing Matrix mode...
 `;
   },
   hack: () => {
-    return "ACCESS GRANTED... Just kidding! 😉";
+    // Disparar evento customizado para iniciar o vídeo
+    const event = new CustomEvent('playHackVideo');
+    window.dispatchEvent(event);
+    
+    return "INICIANDO SEQUÊNCIA DE HACK...\nExecutando exploit...\nBypassando firewall...\nAcesso garantido! 😎";
   },
   help_easter: () => {
     return `
 === Secret Commands ===
-coffee  - Need a break?
-cat    - Meow!
 snake  - Classic snake game
 matrix - Enter the matrix
 hack   - Try to hack the system

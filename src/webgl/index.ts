@@ -284,5 +284,43 @@ export default function WebGL() {
     };
 
     window.requestAnimationFrame(tick);
+
+    // Configurar o manipulador do vídeo hack
+    window.addEventListener('playHackVideo', function() {
+      const video = document.getElementById('hackVideo') as HTMLVideoElement;
+      
+      if (video && assists.screenMesh) {
+        // Criar uma textura de vídeo
+        const videoTexture = new THREE.VideoTexture(video);
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+        videoTexture.format = THREE.RGBFormat;
+        
+        // Guardar o material original
+        const originalMaterial = assists.screenMesh.material;
+        
+        // Criar material com a textura do vídeo
+        const videoMaterial = new THREE.MeshBasicMaterial({ 
+          map: videoTexture,
+          toneMapped: false
+        });
+        
+        // Aplicar o material do vídeo
+        assists.screenMesh.material = videoMaterial;
+        
+        // Iniciar o vídeo
+        video.currentTime = 0;
+        video.play().catch(function(error: Error) {
+          console.log("Video play failed:", error);
+        });
+        
+        // Após 15 segundos, restaurar o material original
+        setTimeout(() => {
+          video.pause();
+          video.currentTime = 0;
+          assists.screenMesh.material = originalMaterial;
+        }, 15000);
+      }
+    });
   });
 }

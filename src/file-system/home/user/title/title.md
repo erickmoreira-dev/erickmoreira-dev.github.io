@@ -6,7 +6,7 @@
 #  *I'm Erick*
 
 ##   • Software Engineer
-##   • Fullstack Developer
+##   • Web Developer
 
 
 

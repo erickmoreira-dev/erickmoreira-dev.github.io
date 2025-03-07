@@ -6,7 +6,7 @@
     <title>Erick Moreira – Site Pessoal</title>
     <meta
       name="description"
-      content="Meu nome é Erick Moreira, sou Desenvolvedor Fullstack e engenheiro de software. Tenho paixão por tudo relacionado à tecnologia, desde engenharia de software e machine learning até UI/UX e gráficos 3D."
+      content="Meu nome é Erick Moreira, sou Desenvolvedor Web e engenheiro de software. Tenho paixão por tudo relacionado à tecnologia, desde engenharia de software e machine learning até UI/UX e gráficos 3D."
     />
 
     <link rel="icon" type="image/png" href="/icon/32x32.png" />
@@ -33,10 +33,225 @@
     <meta property="og:image" content="/icon/og-img1.png" />
     <meta
       name="og:description"
-      content="My name is Erick Moreira, I'm a Fullstack Developer and software engineer. I have a passion for all things technology, from software engineering & machine learning to UI/UX & 3D graphics."
+      content="My name is Erick Moreira, I'm a Web Developer and software engineer. I have a passion for all things technology, from software engineering & machine learning to UI/UX & 3D graphics."
     />
     <link rel="manifest" href="/manifest.json" />
     <script type="module" src="/src/main.ts"></script>
+    <style>
+      /* Estilos para o GameBoy 3D */
+      #gameboy-3d-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: #f6d4b1;
+      }
+      
+      .webgl-3d {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Estilos dos controles do GameBoy 3D */
+      .explode-button {
+        position: relative;
+        display: block;
+        margin: 20px auto 0;
+        z-index: 10;
+        padding: 8px 16px;
+        border: 2px solid #000;
+        background: #f6d4b1;
+        color: #000;
+        font-family: monospace;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      
+      .explode-button:hover {
+        background: #ffb54d;
+      }
+
+      .ui {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+      
+      .ui .group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .ui .label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #000;
+        margin-right: 5px;
+      }
+      
+      .ui .choice {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #000;
+        background: #f6d4b1;
+        position: relative;
+        cursor: pointer;
+        padding: 0;
+      }
+      
+      .ui .choice.is-active {
+        background: #ffb54d;
+      }
+      
+      .ui .choice .icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 14px;
+        height: 14px;
+      }
+      
+      .ui .choice.is-mode-plain .icon {
+        background: #000;
+        border-radius: 50%;
+      }
+      
+      .ui .choice.is-mode-wireframe .icon {
+        border: 2px solid #000;
+        border-radius: 2px;
+        width: 10px;
+        height: 10px;
+      }
+
+      /* Estilos para o menu e animações */
+      .menu-btn {
+        position: relative;
+        z-index: 100;
+      }
+      
+      .menu-btn .btn {
+        transition: transform 0.3s ease-in-out;
+      }
+      
+      nav.active .menu-btn .btn {
+        transform: rotate(90deg);
+      }
+      
+      .menu-body {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        background-color: rgba(246, 212, 177, 0.95);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99;
+        opacity: 0;
+        transition: opacity 0.4s ease, height 0.4s ease;
+      }
+      
+      nav.active .menu-body {
+        height: 100vh;
+        opacity: 1;
+      }
+      
+      .menu-body a {
+        margin: 15px 0;
+        font-size: 1.5em;
+        font-family: "public-pixel", monospace;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        transition-delay: 0.1s;
+      }
+      
+      nav.active .menu-body a {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      nav.active .menu-body a:nth-child(2) {
+        transition-delay: 0.2s;
+      }
+      
+      nav.active .menu-body a:nth-child(3) {
+        transition-delay: 0.3s;
+      }
+      
+      nav.active .menu-body a:nth-child(4) {
+        transition-delay: 0.4s;
+      }
+      
+      /* Melhorar a visibilidade da seta de scroll */
+      #tip-scroll {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #000;
+        background-color: rgba(246, 212, 177, 0.8);
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 50;
+        animation: bounce 2s infinite;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      /* Seta maior e laranja quando o menu está aberto - com !important para garantir prioridade */
+      nav.active #tip-scroll {
+        font-size: 1.8rem !important;
+        color: #fff !important;
+        background-color: #ff8c00 !important; /* Cor laranja */
+        padding: 15px 30px !important;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
+        z-index: 101 !important; /* Valor maior para aparecer acima do menu */
+        animation: bounce 1.5s infinite !important; /* Animação mais rápida */
+      }
+      
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-5px);
+        }
+      }
+
+      /* Estilos existentes */
+      section {
+        padding-bottom: 64px;
+        margin-bottom: 80px;
+        position: relative;
+      }
+
+      section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+    </style>
   </head>
 
   <body>
@@ -44,12 +259,18 @@
 
     <canvas class="webgl"></canvas>
 
+    <!-- Vídeo para o easter egg hack -->
+    <video id="hackVideo" style="display: none;" playsinline>
+      <source src="/videos/hacker.mp4" type="video/mp4">
+      Seu navegador não suporta o elemento de vídeo.
+    </video>
+
     <div id="hero-backup">
       <h3>Olá, eu sou</h3>
       <h1>Erick Moreira</h1>
       <ul>
         <li>Engenheiro de Software</li>
-        <li>Desenvolvedor Fullstack</li>
+        <li>Desenvolvedor Web</li>
       </ul>
     </div>
 
@@ -122,7 +343,7 @@
       <section>
         <h1 id="aboutMe">Olá</h1>
         <p>
-          Meu nome é Erick Moreira, sou Desenvolvedor Fullstack e engenheiro de software. Atualmente estou aprendendo Java e Spring Boot em um programa de ensino da Oracle.
+          Meu nome é Erick Moreira, sou Desenvolvedor Web e engenheiro de software. Atualmente estou aprendendo Java e Spring Boot em um programa de ensino da Oracle.
         </p>
         <p>
           Tenho paixão por tudo relacionado à tecnologia, desde engenharia de software e machine learning até UI/UX e gráficos 3D.
@@ -353,7 +574,20 @@
           ><u><b>LinkedIn</b></u></a
           >
         </p>
+        
+        <!-- GameBoy 3D integrado na seção de contato -->
+        <div style="position: relative; width: 100%; max-width: 800px; height: 600px; margin: 30px auto;">
+          <div id="gameboy-3d-container">
+            <canvas class="webgl-3d"></canvas>
+          </div>
+          <button class="explode-button">SPACE para EXPLODIR</button>
+        </div>
       </section>
+
+      <footer>
+        <p>Design do computador baseado no Commodore PET 8296 - Um computador pessoal clássico de 1981, com monitor monocromático embutido e teclado mecânico. Um dos primeiros designs all-in-one que influenciou a computação moderna.</p>
+        <p>DIREITOS AUTORAIS © 2022-2024 Erick M.</p>
+      </footer>
     </main>
 
     <input type="text" id="textarea" readonly />
@@ -364,23 +598,101 @@
       </div>
       <div id="loading-items">Starting...</div>
     </div>
-    <footer>
-      <p>Design do computador baseado no Commodore PET 8296 - Um computador pessoal clássico de 1981, com monitor monocromático embutido e teclado mecânico. Um dos primeiros designs all-in-one que influenciou a computação moderna.</p>
-      <p>DIREITOS AUTORAIS © 2022-2024 Erick M.</p>
-    </footer>
     <script>
       function closeMenu() {
-        document.getElementsByTagName("nav")[0].classList.remove(["active"]);
+        document.getElementsByTagName("nav")[0].classList.remove("active");
+        
+        // Resetar estilos da seta quando o menu é fechado
+        const scrollTip = document.getElementById('tip-scroll');
+        scrollTip.style.fontSize = '';
+        scrollTip.style.color = '';
+        scrollTip.style.backgroundColor = '';
+        scrollTip.style.padding = '';
+        scrollTip.style.boxShadow = '';
+        scrollTip.style.zIndex = '';
+        
+        // Verificar se deve esconder a seta baseado na posição de rolagem
+        if (window.scrollY > 100) {
+          scrollTip.style.opacity = '0';
+          scrollTip.style.pointerEvents = 'none';
+        }
       }
 
       function toggleMenu() {
         const nav = document.getElementsByTagName("nav")[0];
+        nav.classList.toggle("active");
+        
+        // Certifique-se de que a seta está visível e estilizada corretamente quando o menu estiver aberto
+        const scrollTip = document.getElementById('tip-scroll');
+        
         if (nav.classList.contains("active")) {
-          nav.classList.remove(["active"]);
+          // Aplicar estilos diretamente via JavaScript para garantir que serão aplicados
+          scrollTip.style.opacity = '1';
+          scrollTip.style.pointerEvents = 'auto';
+          scrollTip.style.fontSize = '1.8rem';
+          scrollTip.style.color = '#fff';
+          scrollTip.style.backgroundColor = '#ff8c00';
+          scrollTip.style.padding = '15px 30px';
+          scrollTip.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.3)';
+          scrollTip.style.zIndex = '101';
         } else {
-          nav.classList.add("active");
+          // Resetar estilos se o menu for fechado
+          scrollTip.style.fontSize = '';
+          scrollTip.style.color = '';
+          scrollTip.style.backgroundColor = '';
+          scrollTip.style.padding = '';
+          scrollTip.style.boxShadow = '';
+          scrollTip.style.zIndex = '';
+          
+          // Verificar se deve esconder a seta baseado na posição de rolagem
+          if (window.scrollY > 100) {
+            scrollTip.style.opacity = '0';
+            scrollTip.style.pointerEvents = 'none';
+          }
         }
       }
+      
+      // Adiciona funcionalidade para a seta de scroll
+      document.addEventListener('DOMContentLoaded', function() {
+        const scrollTip = document.getElementById('tip-scroll');
+        if (scrollTip) {
+          scrollTip.addEventListener('click', function() {
+            window.scrollTo({
+              top: window.innerHeight, 
+              behavior: 'smooth'
+            });
+            
+            // Fecha o menu quando a seta é clicada
+            const nav = document.getElementsByTagName("nav")[0];
+            if (nav.classList.contains("active")) {
+              closeMenu();
+            }
+          });
+          
+          // Esconde a seta depois de rolar, mas apenas se o menu não estiver aberto
+          window.addEventListener('scroll', function() {
+            const nav = document.getElementsByTagName("nav")[0];
+            
+            if (window.scrollY > 100 && !nav.classList.contains("active")) {
+              scrollTip.style.opacity = '0';
+              scrollTip.style.pointerEvents = 'none';
+            } else {
+              scrollTip.style.opacity = '1';
+              scrollTip.style.pointerEvents = 'auto';
+              
+              // Se o menu estiver aberto, garantir que a seta mantenha o estilo laranja
+              if (nav.classList.contains("active")) {
+                scrollTip.style.fontSize = '1.8rem';
+                scrollTip.style.color = '#fff';
+                scrollTip.style.backgroundColor = '#ff8c00';
+                scrollTip.style.padding = '15px 30px';
+                scrollTip.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.3)';
+                scrollTip.style.zIndex = '101';
+              }
+            }
+          });
+        }
+      });
     </script>
     <script
       fetchpriority="high"
@@ -474,6 +786,776 @@
             Translate`;
         }
       }
+    </script>
+
+    <!-- Script do GameBoy 3D -->
+    <script type="module">
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+      import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+      import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+      import gsap from 'gsap';
+      import WebGL from '/src/webgl';
+
+      class GameBoy3D {
+        constructor() {
+          this.init();
+        }
+
+        async init() {
+          // Initialize Three.js scene
+          this.setupScene();
+          
+          // Setup environment maps
+          await this.setupEnvironment();
+
+          // Load assets
+          await this.loadAssets();
+
+          // Setup Cartridge components
+          this.setupCartridge();
+
+          // Setup controls and inputs
+          this.setupControls();
+
+          // Setup Audio
+          this.setupAudio();
+
+          // Start animation loop
+          this.animate();
+        }
+
+        setupScene() {
+          // Canvas
+          this.canvas = document.querySelector('.webgl-3d');
+
+          // Scene
+          this.scene = new THREE.Scene();
+          this.scene.background = new THREE.Color('#f6d4b1');
+
+          const container = document.getElementById('gameboy-3d-container');
+          const width = container.clientWidth;
+          const height = container.clientHeight;
+
+          // Camera
+          this.camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
+          this.camera.position.set(0, 0, 13);
+          this.scene.add(this.camera);
+
+          // Renderer
+          this.renderer = new THREE.WebGLRenderer({
+            canvas: this.canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+          });
+          this.renderer.setSize(width, height);
+          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          this.renderer.outputEncoding = THREE.sRGBEncoding;
+          this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          this.renderer.toneMappingExposure = 1.2;
+          this.renderer.shadowMap.enabled = true;
+          this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          this.renderer.physicallyCorrectLights = true;
+          
+          // Controls
+          this.controls = new OrbitControls(this.camera, this.canvas);
+          this.controls.enableDamping = true;
+          this.controls.dampingFactor = 0.05;
+          this.controls.enableZoom = true;
+          this.controls.minDistance = 4;
+          this.controls.maxDistance = 15;
+          this.controls.maxPolarAngle = Math.PI / 1.5;
+          this.controls.minPolarAngle = Math.PI / 4;
+          
+          // Adiciona flag para controlar se o mouse está se movendo
+          this.controls.isMouseMoving = false;
+          
+          this.canvas.addEventListener('pointerdown', () => {
+            this.controls.isMouseMoving = true;
+          });
+          
+          this.canvas.addEventListener('pointerup', () => {
+            this.controls.isMouseMoving = false;
+          });
+          
+          this.canvas.addEventListener('pointermove', () => {
+            if (this.controls.isMouseMoving) {
+              this.controls.isMouseMoving = true;
+            }
+          });
+          
+          // Set initial camera target
+          this.controls.target.set(0, 0, 0);
+          this.controls.update();
+
+          // Handle resize
+          window.addEventListener('resize', () => {
+            const container = document.getElementById('gameboy-3d-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Update camera
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+
+            // Update renderer
+            this.renderer.setSize(width, height);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          });
+        }
+
+        async setupEnvironment() {
+          return new Promise((resolve) => {
+            // Carregar o mapa de ambiente HDR
+            const rgbeLoader = new RGBELoader();
+            rgbeLoader.load('/envMaps/custom-002.hdr', (texture) => {
+              texture.mapping = THREE.EquirectangularReflectionMapping;
+              this.scene.environment = texture;
+              
+              // Configurar iluminação adicional
+              const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+              this.scene.add(ambientLight);
+
+              const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+              directionalLight.position.set(1, 2, 3);
+              directionalLight.castShadow = true;
+              directionalLight.shadow.mapSize.width = 1024;
+              directionalLight.shadow.mapSize.height = 1024;
+              directionalLight.shadow.camera.near = 0.1;
+              directionalLight.shadow.camera.far = 20;
+              directionalLight.shadow.normalBias = 0.02;
+              this.scene.add(directionalLight);
+              
+              resolve();
+            }, undefined, (error) => {
+              console.warn('Failed to load environment map, using fallback lighting');
+              const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+              this.scene.add(ambientLight);
+              resolve();
+            });
+          });
+        }
+
+        async loadAssets() {
+          return new Promise((resolve) => {
+            const loadingManager = new THREE.LoadingManager();
+            
+            // Criar um grupo pai para todos os componentes
+            this.gameboyGroup = new THREE.Group();
+            this.scene.add(this.gameboyGroup);
+            
+            let loadedCount = 0;
+            const totalModels = 4; // case, circuit, screw, sticker
+            
+            const checkAllLoaded = () => {
+              loadedCount++;
+              if (loadedCount === totalModels) {
+                resolve();
+              }
+            };
+            
+            // Inicialize o loader do GLTF
+            this.gltfLoader = new GLTFLoader(loadingManager);
+            
+            // Carregue o modelo do case
+            this.gltfLoader.load('/models/case.glb', (gltf) => {
+              this.gameboy = gltf.scene;
+              console.log("Case model loaded:", this.gameboy);
+              
+              // Aplicar material de vidro às cases do GameBoy
+              this.gameboy.traverse(child => {
+                if (child.isMesh) {
+                  // Cor base do GameBoy (preservando a cor original)
+                  const originalColor = child.material.color 
+                    ? new THREE.Color(child.material.color.r, child.material.color.g, child.material.color.b)
+                    : new THREE.Color(0xf0ead6); // Cor que corresponde ao GameBoy original
+                  
+                  // Cores para os reflexos mais sutis e naturais
+                  const blueReflection = new THREE.Color(0x84a9c0); // Azul mais suave/pastel
+                  const pinkReflection = new THREE.Color(0xdcacb9); // Rosa mais suave/pastel
+                  
+                  // Material de vidro com reflexos mais naturais
+                  const glassMaterial = new THREE.MeshPhysicalMaterial({
+                    color: originalColor,
+                    metalness: 0.1,           // Reduzido para menos metalicidade
+                    roughness: 0.1,           // Ligeiramente aumentado para reflexos mais naturais
+                    transmission: 0.85,
+                    transparent: true,
+                    opacity: 0.75,
+                    envMapIntensity: 1.2,     // Reduzido para reflexos menos intensos
+                    clearcoat: 0.6,           // Reduzido para um efeito mais natural
+                    clearcoatRoughness: 0.2,  // Aumentado para dispersar o brilho
+                    ior: 1.45,
+                    thickness: 0.5,
+                    attenuationColor: pinkReflection, // Cor rosa mais suave
+                    attenuationDistance: 0.8,  // Aumentado para efeito mais sutil
+                    specularIntensity: 0.7,    // Reduzido para menor intensidade
+                    specularColor: blueReflection, // Cor azul mais suave
+                    iridescence: 0.05,         // Drasticamente reduzido
+                    iridescenceIOR: 1.3,
+                    sheen: 0.1,                // Drasticamente reduzido
+                    sheenRoughness: 0.8,       // Aumentado para dispersar o efeito
+                    sheenColor: pinkReflection  // Mantendo o rosa suave
+                  });
+                  
+                  // Preservar texturas originais
+                  if (child.material.map) glassMaterial.map = child.material.map;
+                  if (child.material.normalMap) glassMaterial.normalMap = child.material.normalMap;
+                  
+                  // Aplicar material e configurar sombras
+                  child.material = glassMaterial;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
+              
+              this.gameboyGroup.add(this.gameboy);
+              checkAllLoaded();
+            });
+
+            // Carregue o modelo do circuito
+            this.gltfLoader.load('/models/circuit.glb', (gltf) => {
+              this.circuit = gltf.scene;
+              console.log("Circuit model loaded:", this.circuit);
+              
+              this.circuit.traverse(child => {
+                if (child.isMesh && child.material) {
+                  child.material.envMapIntensity = 1.5;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
+              
+              this.gameboyGroup.add(this.circuit);
+              checkAllLoaded();
+            });
+
+            // Carregue o modelo dos parafusos
+            this.gltfLoader.load('/models/screw.glb', (gltf) => {
+              this.screw = gltf.scene;
+              console.log("Screw model loaded:", this.screw);
+              
+              this.screw.traverse(child => {
+                if (child.isMesh && child.material) {
+                  child.material.envMapIntensity = 2.5;
+                  child.material.metalness = 1.0;
+                  child.material.roughness = 0.2;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
+              
+              this.gameboyGroup.add(this.screw);
+              checkAllLoaded();
+            });
+
+            // Carregue o modelo do sticker
+            this.gltfLoader.load('/models/sticker.glb', (gltf) => {
+              this.sticker = gltf.scene;
+              console.log("Sticker model loaded:", this.sticker);
+              
+              this.sticker.traverse(child => {
+                if (child.isMesh && child.material) {
+                  child.material.envMapIntensity = 0.8;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
+              
+              this.gameboyGroup.add(this.sticker);
+              checkAllLoaded();
+            });
+
+            // Load audio
+            const audioLoader = new THREE.AudioLoader(loadingManager);
+            audioLoader.load('/sounds/debrisOpening.mp3', (buffer) => {
+              this.openingSound = buffer;
+            });
+            
+            audioLoader.load('/sounds/debrisClosing.mp3', (buffer) => {
+              this.closingSound = buffer;
+            });
+          });
+        }
+
+        setupCartridge() {
+          // Position adjustments for cartridge components
+          if (this.gameboy) {
+            this.gameboy.position.set(0, 0, 0);
+            this.gameboy.traverse(child => {
+              if (child.isMesh && child.material) {
+                child.material.envMapIntensity = 1.2;
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+          }
+
+          if (this.sticker) {
+            // Ajustar posição e escala do sticker
+            this.sticker.position.set(0, 0, 0.05); // Mais próximo da superfície
+            this.sticker.scale.set(1.04, 1.04, 1); // Escala reduzida para encaixar melhor no quadrado
+            
+            this.sticker.traverse(child => {
+              if (child.isMesh && child.material) {
+                // Ajustes do material para melhor visibilidade
+                child.material.envMapIntensity = 0.8;
+                child.material.depthWrite = true;
+                child.material.polygonOffset = true;
+                child.material.polygonOffsetFactor = -1;
+                child.material.polygonOffsetUnits = -1;
+                child.material.transparent = false;
+                child.material.opacity = 1;
+                child.material.side = THREE.FrontSide;
+                child.renderOrder = 2;
+                
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+          }
+
+          // Ajustar posição do circuito
+          if (this.circuit) {
+            this.circuit.position.set(0, 0, -0.1); // Movido mais para trás
+            this.circuit.traverse(child => {
+              if (child.isMesh && child.material) {
+                child.material.envMapIntensity = 1.5;
+                child.renderOrder = 0;
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+          }
+
+          // Ajustar posição dos parafusos
+          if (this.screw) {
+            this.screw.position.set(0, 0, -0.05); // Ajustado para alinhar melhor com o case
+            this.screw.traverse(child => {
+              if (child.isMesh && child.material) {
+                child.material.envMapIntensity = 2.5;
+                child.material.metalness = 1.0;
+                child.material.roughness = 0.2;
+                child.renderOrder = 1;
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+          }
+
+          // Ajustar posição do grupo pai
+          if (this.gameboyGroup) {
+            this.gameboyGroup.position.set(0, 0, 0);
+            this.gameboyGroup.rotation.set(0, 0, 0);
+          }
+        }
+
+        setupAudio() {
+          // Create an audio listener and add it to the camera
+          this.audioListener = new THREE.AudioListener();
+          this.camera.add(this.audioListener);
+          
+          // Create a global audio source
+          this.sound = new THREE.Audio(this.audioListener);
+          
+          // Load audio files
+          const audioLoader = new THREE.AudioLoader();
+          audioLoader.load('/sounds/debrisOpening.mp3', (buffer) => {
+            this.openingSound = buffer;
+          });
+          
+          audioLoader.load('/sounds/debrisClosing.mp3', (buffer) => {
+            this.closingSound = buffer;
+          });
+        }
+
+        saveComponentOriginalState(component) {
+          if (!component.originalState) {
+            component.originalState = {
+              position: component.position.clone(),
+              rotation: component.rotation.clone(),
+              scale: component.scale.clone()
+            };
+          }
+        }
+
+        restoreComponentToOriginalState(component) {
+          if (component.originalState) {
+            gsap.to(component.position, {
+              duration: 1.5,
+              x: component.originalState.position.x,
+              y: component.originalState.position.y,
+              z: component.originalState.position.z,
+              ease: "power2.inOut"
+            });
+
+            gsap.to(component.rotation, {
+              duration: 1.9,
+              x: component.originalState.rotation.x,
+              y: component.originalState.rotation.y,
+              z: component.originalState.rotation.z,
+              ease: "power2.inOut"
+            });
+          }
+        }
+
+        toggleExplodedView() {
+          const isExploding = this.isExploded;
+          
+          // Play sound effect
+          if (this.sound) {
+            const soundBuffer = isExploding ? this.openingSound : this.closingSound;
+            if (soundBuffer) {
+              this.sound.setBuffer(soundBuffer);
+              this.sound.setVolume(0.5);
+              if (this.sound.isPlaying) {
+                this.sound.stop();
+              }
+              this.sound.play();
+            }
+          }
+
+          // Save original states if not already saved
+          if (!this.statesAreSaved) {
+            this.statesAreSaved = true;
+            
+            // Save states for all components
+            const saveState = (component) => {
+              if (!component) return;
+              
+              component.traverse((child) => {
+                if (child.isMesh) {
+                  if (!child.userData.originalState) {
+                    child.userData.originalState = {
+                      position: child.position.clone(),
+                      rotation: child.rotation.clone()
+                    };
+                  }
+                }
+              });
+            };
+
+            // Save states for all major components
+            saveState(this.screw);
+            saveState(this.gameboy);
+            saveState(this.sticker);
+            saveState(this.circuit);
+          }
+
+          // Animate screws
+          if (this.screw) {
+            this.screw.traverse((child) => {
+              if (child.isMesh && child.userData.originalState) {
+                if (isExploding) {
+                  gsap.to(child.rotation, {
+                    z: -Math.PI * 2,
+                    duration: 2.0,
+                    ease: "power1.inOut",
+                    delay: 0
+                  });
+
+                  gsap.to(child.position, {
+                    z: child.position.z - 2.7,
+                    duration: 2.0,
+                    ease: "power2.out",
+                    delay: 0
+                  });
+                } else {
+                  gsap.to(child.position, {
+                    x: child.userData.originalState.position.x,
+                    y: child.userData.originalState.position.y,
+                    z: child.userData.originalState.position.z,
+                    duration: 2.0,
+                    ease: "power2.inOut",
+                    delay: 2.5  // Increased delay for assembly
+                  });
+
+                  gsap.to(child.rotation, {
+                    x: child.userData.originalState.rotation.x,
+                    y: child.userData.originalState.rotation.y,
+                    z: child.userData.originalState.rotation.z,
+                    duration: 2.0,
+                    ease: "power2.inOut",
+                    delay: 2.0  // Increased delay for assembly
+                  });
+                }
+              }
+            });
+          }
+
+          // Animate case
+          if (this.gameboy) {
+            let frontPart = null;
+            let backPart = null;
+
+            this.gameboy.traverse((child) => {
+              if (child.isMesh) {
+                if (!child.userData.originalState) {
+                  child.userData.originalState = {
+                    position: child.position.clone(),
+                    rotation: child.rotation.clone()
+                  };
+                }
+
+                if (child.name.toLowerCase().includes('front') || child.position.z > 0) {
+                  frontPart = child;
+                } else if (child.name.toLowerCase().includes('back') || child.position.z <= 0) {
+                  backPart = child;
+                }
+              }
+            });
+
+            if (frontPart && backPart) {
+              if (isExploding) {
+                gsap.to(frontPart.position, {
+                  z: frontPart.position.z + 2.0,
+                  duration: 2.5,
+                  ease: "power2.inOut",
+                  delay: 1.2
+                });
+
+                gsap.to(backPart.position, {
+                  z: backPart.position.z - 2.0,
+                  duration: 2.5,
+                  ease: "power2.inOut",
+                  delay: 1.2
+                });
+              } else {
+                gsap.to(frontPart.position, {
+                  x: frontPart.userData.originalState.position.x,
+                  y: frontPart.userData.originalState.position.y,
+                  z: frontPart.userData.originalState.position.z,
+                  duration: 2.5,
+                  ease: "power2.inOut",
+                  delay: 1.2
+                });
+
+                gsap.to(backPart.position, {
+                  x: backPart.userData.originalState.position.x,
+                  y: backPart.userData.originalState.position.y,
+                  z: backPart.userData.originalState.position.z,
+                  duration: 2.5,
+                  ease: "power2.inOut",
+                  delay: 1.2
+                });
+              }
+            }
+          }
+
+          // Animate sticker
+          if (this.sticker) {
+            if (!this.sticker.userData.originalState) {
+              this.sticker.userData.originalState = {
+                position: this.sticker.position.clone(),
+                rotation: this.sticker.rotation.clone()
+              };
+            }
+
+            if (isExploding) {
+              gsap.to(this.sticker.position, {
+                z: this.sticker.position.z + 3.0,
+                duration: 2.0,
+                ease: "power2.out",
+                delay: 0.8
+              });
+            } else {
+              gsap.to(this.sticker.position, {
+                x: this.sticker.userData.originalState.position.x,
+                y: this.sticker.userData.originalState.position.y,
+                z: this.sticker.userData.originalState.position.z,
+                duration: 2.0,
+                ease: "power2.inOut",
+                delay: 2.3  // Increased delay for assembly
+              });
+            }
+          }
+
+          // Animate circuit components
+          if (this.circuit) {
+            this.circuit.traverse((child) => {
+              if (child.isMesh) {
+                if (!child.userData.originalState) {
+                  child.userData.originalState = {
+                    position: child.position.clone(),
+                    rotation: child.rotation.clone()
+                  };
+                }
+
+                if (isExploding) {
+                  const randomDelay = Math.random() * 0.3;
+                  const randomDistance = 0.8 + (Math.random() * 0.4);
+
+                  gsap.to(child.position, {
+                    z: child.position.z + (0.7 * randomDistance),
+                    duration: 2.0,
+                    ease: "power2.out",
+                    delay: 1.5 + randomDelay
+                  });
+                } else {
+                  gsap.to(child.position, {
+                    x: child.userData.originalState.position.x,
+                    y: child.userData.originalState.position.y,
+                    z: child.userData.originalState.position.z,
+                    duration: 2.0,
+                    ease: "power2.inOut",
+                    delay: 1.5 + (Math.random() * 0.2)
+                  });
+                }
+              }
+            });
+          }
+        }
+
+        animate() {
+          let lastInteractionTime = Date.now();
+          let isRotating = true;
+
+          const animate = () => {
+            requestAnimationFrame(animate);
+            
+            try {
+              // Update controls
+              if (this.controls) {
+                this.controls.update();
+                
+                // Se os controles estiverem sendo usados, atualiza o tempo da última interação
+                if (this.controls.isMouseMoving) {
+                  lastInteractionTime = Date.now();
+                  isRotating = false;
+                } else {
+                  // Verifica se passaram 5 segundos desde a última interação
+                  const timeSinceLastInteraction = Date.now() - lastInteractionTime;
+                  if (timeSinceLastInteraction >= 5000) {
+                    isRotating = true;
+                  }
+                }
+              }
+              
+              // Rotação do grupo quando não explodido e permitido rotacionar
+              if (!this.isExploded && this.gameboyGroup && isRotating) {
+                this.gameboyGroup.rotation.y += 0.0025;
+              }
+              
+              // Render scene
+              if (this.renderer && this.scene && this.camera) {
+                this.renderer.render(this.scene, this.camera);
+              }
+            } catch (error) {
+              console.error('Error in animation:', error);
+            }
+          };
+          
+          animate();
+        }
+
+        setupControls() {
+          // Controls for exploding/imploding the cartridge
+          this.isExploded = false;
+          
+          document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+              this.isExploded = !this.isExploded;
+              this.toggleExplodedView();
+              this.updateExplodeButtonText();
+            }
+          });
+          
+          // Add button listener for mobile devices
+          this.explodeButton = document.querySelector('#gameboy-3d-container + .explode-button');
+          if (this.explodeButton) {
+            this.explodeButton.addEventListener('click', () => {
+              this.isExploded = !this.isExploded;
+              this.toggleExplodedView();
+              this.updateExplodeButtonText();
+            });
+          }
+
+          // OrbitControls setup
+          this.controls = new OrbitControls(this.camera, this.canvas);
+          this.controls.enableDamping = true;
+          this.controls.dampingFactor = 0.05;
+          this.controls.enableZoom = true;
+          this.controls.minDistance = 4;
+          this.controls.maxDistance = 15;
+          this.controls.maxPolarAngle = Math.PI / 1.5;
+          this.controls.minPolarAngle = Math.PI / 4;
+          
+          // Adiciona flag para controlar se o mouse está se movendo
+          this.controls.isMouseMoving = false;
+          
+          this.canvas.addEventListener('pointerdown', () => {
+            this.controls.isMouseMoving = true;
+          });
+          
+          this.canvas.addEventListener('pointerup', () => {
+            this.controls.isMouseMoving = false;
+          });
+          
+          this.canvas.addEventListener('pointermove', () => {
+            if (this.controls.isMouseMoving) {
+              this.controls.isMouseMoving = true;
+            }
+          });
+          
+          // Set initial camera target
+          this.controls.target.set(0, 0, 0);
+          this.controls.update();
+        }
+
+        updateExplodeButtonText() {
+          if (this.explodeButton) {
+            this.explodeButton.textContent = `SPACE para ${this.isExploded ? 'IMPLODIR' : 'EXPLODIR'}`;
+          }
+        }
+      }
+
+      // Initialize GameBoy 3D when the section is visible
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Create new GameBoy3D instance if it doesn't exist
+            if (!entry.target.gameboy) {
+              entry.target.gameboy = new GameBoy3D();
+            }
+            
+            // Trigger automatic disassembly/reassembly animation
+            setTimeout(() => {
+              // Trigger explosion
+              entry.target.gameboy.isExploded = true;
+              entry.target.gameboy.toggleExplodedView();
+              entry.target.gameboy.updateExplodeButtonText();
+              
+              // Trigger implosion after 3 seconds
+              setTimeout(() => {
+                entry.target.gameboy.isExploded = false;
+                entry.target.gameboy.toggleExplodedView();
+                entry.target.gameboy.updateExplodeButtonText();
+              }, 3000);
+            }, 1000); // Wait 1 second after initialization to start the animation sequence
+          }
+        });
+      }, { threshold: 0.2 });
+
+      // Observe the GameBoy 3D section
+      document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('gameboy-3d-container');
+        if (container) {
+          observer.observe(container);
+        }
+      });
+
+      loadAssists((assists) => {
+        const stats = new Stats();
+        // ... existing code ...
+
+        const screen = Screen(assists, renderer);
+
+        // Manipulador do vídeo hack
+        WebGL.setupHackVideo(assists);
+
+        // ... rest of the code ...
+      });
     </script>
   </body>
 </html>

@@ -54,16 +54,12 @@ Available commands:
     secret: () => {
       print(`
 Try these:
-  coffee
-  cat
   matrix
   hack
   snake
 `);
     },
     // Easter Egg Commands
-    coffee: () => print(ASCII_ART.coffee),
-    cat: () => print(ASCII_ART.cat),
     matrix: () => {
       print(SPECIAL_COMMANDS.matrix());
       
