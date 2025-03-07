@@ -288,15 +288,6 @@ section {
   position: relative;
 }
 
-section::after {
-  content: "";
-  border-bottom: dashed 2px var(--color);
-  position: absolute;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: clamp(0px, 95vw, 680px);
-}
-
 section:last-of-type {
   border-bottom: none;
   margin-bottom: 0;

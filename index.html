@@ -37,6 +37,18 @@
     />
     <link rel="manifest" href="/manifest.json" />
     <script type="module" src="/src/main.ts"></script>
+    <!-- GSAP CDN para animações -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      // Verificar se o GSAP foi carregado corretamente
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.gsap) {
+          console.log('GSAP carregado com sucesso, versão:', window.gsap.version);
+        } else {
+          console.error('ERRO: GSAP não foi carregado!');
+        }
+      });
+    </script>
     <style>
       /* Estilos para o GameBoy 3D */
       #gameboy-3d-container {
@@ -702,8 +714,6 @@
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-EDNKHGV4HB"
     ></script>
-    <!-- Adicionar CDN do GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -796,6 +806,7 @@
       import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
       import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
       import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+      // Remover importação local do GSAP e usar variável global
       import WebGL from '/src/webgl';
 
       class GameBoy3D {
@@ -1183,7 +1194,7 @@
 
         restoreComponentToOriginalState(component) {
           if (component.originalState) {
-            gsap.to(component.position, {
+            window.gsap.to(component.position, {
               duration: 1.5,
               x: component.originalState.position.x,
               y: component.originalState.position.y,
@@ -1191,7 +1202,7 @@
               ease: "power2.inOut"
             });
 
-            gsap.to(component.rotation, {
+            window.gsap.to(component.rotation, {
               duration: 1.9,
               x: component.originalState.rotation.x,
               y: component.originalState.rotation.y,
@@ -1249,21 +1260,21 @@
             this.screw.traverse((child) => {
               if (child.isMesh && child.userData.originalState) {
                 if (isExploding) {
-                  gsap.to(child.rotation, {
+                  window.gsap.to(child.rotation, {
                     z: -Math.PI * 2,
                     duration: 2.0,
                     ease: "power1.inOut",
                     delay: 0
                   });
 
-                  gsap.to(child.position, {
+                  window.gsap.to(child.position, {
                     z: child.position.z - 2.7,
                     duration: 2.0,
                     ease: "power2.out",
                     delay: 0
                   });
                 } else {
-                  gsap.to(child.position, {
+                  window.gsap.to(child.position, {
                     x: child.userData.originalState.position.x,
                     y: child.userData.originalState.position.y,
                     z: child.userData.originalState.position.z,
@@ -1272,7 +1283,7 @@
                     delay: 2.5  // Increased delay for assembly
                   });
 
-                  gsap.to(child.rotation, {
+                  window.gsap.to(child.rotation, {
                     x: child.userData.originalState.rotation.x,
                     y: child.userData.originalState.rotation.y,
                     z: child.userData.originalState.rotation.z,
@@ -1309,21 +1320,21 @@
 
             if (frontPart && backPart) {
               if (isExploding) {
-                gsap.to(frontPart.position, {
+                window.gsap.to(frontPart.position, {
                   z: frontPart.position.z + 2.0,
                   duration: 2.5,
                   ease: "power2.inOut",
                   delay: 1.2
                 });
 
-                gsap.to(backPart.position, {
+                window.gsap.to(backPart.position, {
                   z: backPart.position.z - 2.0,
                   duration: 2.5,
                   ease: "power2.inOut",
                   delay: 1.2
                 });
               } else {
-                gsap.to(frontPart.position, {
+                window.gsap.to(frontPart.position, {
                   x: frontPart.userData.originalState.position.x,
                   y: frontPart.userData.originalState.position.y,
                   z: frontPart.userData.originalState.position.z,
@@ -1332,7 +1343,7 @@
                   delay: 1.2
                 });
 
-                gsap.to(backPart.position, {
+                window.gsap.to(backPart.position, {
                   x: backPart.userData.originalState.position.x,
                   y: backPart.userData.originalState.position.y,
                   z: backPart.userData.originalState.position.z,
@@ -1354,14 +1365,14 @@
             }
 
             if (isExploding) {
-              gsap.to(this.sticker.position, {
+              window.gsap.to(this.sticker.position, {
                 z: this.sticker.position.z + 3.0,
                 duration: 2.0,
                 ease: "power2.out",
                 delay: 0.8
               });
             } else {
-              gsap.to(this.sticker.position, {
+              window.gsap.to(this.sticker.position, {
                 x: this.sticker.userData.originalState.position.x,
                 y: this.sticker.userData.originalState.position.y,
                 z: this.sticker.userData.originalState.position.z,
@@ -1387,14 +1398,14 @@
                   const randomDelay = Math.random() * 0.3;
                   const randomDistance = 0.8 + (Math.random() * 0.4);
 
-                  gsap.to(child.position, {
+                  window.gsap.to(child.position, {
                     z: child.position.z + (0.7 * randomDistance),
                     duration: 2.0,
                     ease: "power2.out",
                     delay: 1.5 + randomDelay
                   });
                 } else {
-                  gsap.to(child.position, {
+                  window.gsap.to(child.position, {
                     x: child.userData.originalState.position.x,
                     y: child.userData.originalState.position.y,
                     z: child.userData.originalState.position.z,
@@ -1515,34 +1526,72 @@
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
+            console.log("GameBoy section is visible, initializing animation");
             // Create new GameBoy3D instance if it doesn't exist
             if (!entry.target.gameboy) {
+              console.log("Creating new GameBoy3D instance");
               entry.target.gameboy = new GameBoy3D();
-            }
-            
-            // Trigger automatic disassembly/reassembly animation
-            setTimeout(() => {
-              // Trigger explosion
-              entry.target.gameboy.isExploded = true;
-              entry.target.gameboy.toggleExplodedView();
-              entry.target.gameboy.updateExplodeButtonText();
               
-              // Trigger implosion after 3 seconds
-              setTimeout(() => {
-                entry.target.gameboy.isExploded = false;
+              // Define uma função para executar a animação de explosão/implosão
+              const runExplodeAnimation = () => {
+                // Verificar se o GameBoy está pronto para ser animado
+                if (!entry.target.gameboy.gameboyGroup || !entry.target.gameboy.toggleExplodedView) {
+                  console.error("GameBoy não está pronto para animação");
+                  return;
+                }
+                
+                console.log("Starting automatic explosion animation");
+                // Trigger explosion
+                entry.target.gameboy.isExploded = true;
                 entry.target.gameboy.toggleExplodedView();
                 entry.target.gameboy.updateExplodeButtonText();
-              }, 3000);
-            }, 1000); // Wait 1 second after initialization to start the animation sequence
+                
+                // Trigger implosion after 3 seconds
+                setTimeout(() => {
+                  console.log("Starting automatic implosion animation");
+                  entry.target.gameboy.isExploded = false;
+                  entry.target.gameboy.toggleExplodedView();
+                  entry.target.gameboy.updateExplodeButtonText();
+                }, 3000);
+              };
+              
+              // Executar a animação pela primeira vez após 2 segundos
+              setTimeout(runExplodeAnimation, 2000);
+              
+              // Configurar animação automática periódica a cada 30 segundos
+              entry.target.gameboy.autoAnimationInterval = window.setInterval(() => {
+                // Verificar se o elemento está visível na página
+                const rect = document.getElementById('gameboy-3d-container').getBoundingClientRect();
+                const isVisible = (
+                  rect.top >= 0 &&
+                  rect.left >= 0 &&
+                  rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                  rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                );
+                
+                if (isVisible) {
+                  runExplodeAnimation();
+                }
+              }, 30000); // Repetir a cada 30 segundos
+            }
+          } else {
+            // Se saiu da visualização, limpar intervalo de animação automática
+            if (entry.target.gameboy && entry.target.gameboy.autoAnimationInterval) {
+              window.clearInterval(entry.target.gameboy.autoAnimationInterval);
+            }
           }
         });
       }, { threshold: 0.2 });
 
       // Observe the GameBoy 3D section
       document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM loaded, setting up GameBoy observer");
         const container = document.getElementById('gameboy-3d-container');
         if (container) {
+          console.log("GameBoy container found, starting observation");
           observer.observe(container);
+        } else {
+          console.error("GameBoy container not found!");
         }
       });
 
