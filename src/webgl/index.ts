@@ -238,7 +238,7 @@ export default function WebGL() {
       camera.position.z = valMap(
         scroll,
         [0, 1],
-        [-2.5 - sizes.portraitOffset, -10 - sizes.portraitOffset]
+        [-2.5 - sizes.portraitOffset, -15 - sizes.portraitOffset]
       );
 
       computerGroup.position.x = controlProps.computerHorizontal * zoomFac;
