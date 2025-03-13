@@ -1675,135 +1675,72 @@
         // Definir caminho base de acordo com o ambiente
         const basePath = isGitHubPages ? '/erickmoreira-dev.github.io' : '';
         
-        // Tentar carregar o modelo com o caminho correto para cada ambiente
-        const modelPath = `${basePath}/models/14bis.glb`;
-        console.log('Tentando carregar modelo do caminho:', modelPath);
+        // Array de caminhos para tentar em ordem
+        const paths = [
+          `${basePath}/models/14bis.glb`,
+          `${basePath}/public/models/14bis.glb`,
+          'models/14bis.glb',
+          '/models/14bis.glb',
+          './models/14bis.glb',
+          '../models/14bis.glb'
+        ];
         
-        loader.load(
-          modelPath, 
-          (gltf) => {
-            console.log('Modelo 14bis carregado com sucesso!', gltf);
-            
-            const model = gltf.scene;
-            
-            // Ajustar escala para o tamanho desejado - AUMENTADO SIGNIFICATIVAMENTE
-            model.scale.set(1.5, 1.5, 1.5);
-            
-            // Centralizar o modelo
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            model.position.x = -center.x;
-            model.position.y = -center.y;
-            model.position.z = -center.z;
-            
-            // Ajustar rotação para melhor visualização
-            model.rotation.y = Math.PI / 2.5;
-            
-            scene.add(model);
-            
-            // Ajustar a câmera para enquadrar bem o modelo com o novo tamanho
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const fov = camera.fov * (Math.PI / 180);
-            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-            cameraZ *= 1.2; // Fator de zoom reduzido para aproximar a câmera
-            
-            // Posicionar a câmera para uma melhor visualização do modelo maior
-            camera.position.set(cameraZ, cameraZ/3, cameraZ);
-            camera.lookAt(0, 0, 0);
-            
-            controls.update();
-          },
-          (progress) => {
-            console.log(`Progresso de carregamento: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
-          },
-          (error) => {
-            console.error('Erro ao carregar o modelo 14bis:', error);
-            console.error('Caminho que falhou:', modelPath);
-            
-            // Tentar caminhos alternativos se falhar
-            console.log('Tentando caminhos alternativos...');
-            
-            // Array de caminhos para tentar em caso de falha
-            // Incluindo mais variações que podem funcionar no GitHub Pages
-            const alternativePaths = isGitHubPages ? [
-              './models/14bis.glb',
-              'models/14bis.glb',
-              '/models/14bis.glb',
-              '../models/14bis.glb',
-              'public/models/14bis.glb',
-              '/public/models/14bis.glb',
-              '/erickmoreira-dev.github.io/models/14bis.glb',
-              '/erickmoreira-dev.github.io/public/models/14bis.glb'
-            ] : [
-              './models/14bis.glb',
-              '../models/14bis.glb',
-              '/models/14bis.glb',
-              './public/models/14bis.glb'
-            ];
-            
-            // Função para tentar o próximo caminho
-            const tryNextPath = (index) => {
-              if (index >= alternativePaths.length) {
-                console.error('Todos os caminhos falharam. Não foi possível carregar o modelo 14bis.');
-                
-                // Criar um cubo vermelho como substituição para mostrar onde o modelo deveria estar
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
-                const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-                const cube = new THREE.Mesh(geometry, material);
-                scene.add(cube);
-                
-                console.log('Cubo de teste adicionado para verificar se a renderização está funcionando');
-                return;
-              }
-              
-              const path = alternativePaths[index];
-              console.log(`Tentando caminho alternativo [${index+1}/${alternativePaths.length}]: ${path}`);
-              
-              loader.load(
-                path,
-                (gltf) => {
-                  console.log(`Modelo carregado com sucesso do caminho: ${path}`, gltf);
-                  
-                  const model = gltf.scene;
-                  model.scale.set(1.5, 1.5, 1.5);
-                  
-                  const box = new THREE.Box3().setFromObject(model);
-                  const center = box.getCenter(new THREE.Vector3());
-                  model.position.x = -center.x;
-                  model.position.y = -center.y;
-                  model.position.z = -center.z;
-                  
-                  model.rotation.y = Math.PI / 2.5;
-                  
-                  scene.add(model);
-                  
-                  const size = box.getSize(new THREE.Vector3());
-                  const maxDim = Math.max(size.x, size.y, size.z);
-                  const fov = camera.fov * (Math.PI / 180);
-                  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                  cameraZ *= 1.2;
-                  
-                  camera.position.set(cameraZ, cameraZ/3, cameraZ);
-                  camera.lookAt(0, 0, 0);
-                  
-                  controls.update();
-                },
-                (progress) => {
-                  console.log(`Progresso de carregamento [${path}]: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
-                },
-                (error) => {
-                  console.error(`Falha ao carregar de [${path}]:`, error);
-                  // Se falhar, tenta o próximo caminho
-                  tryNextPath(index + 1);
-                }
-              );
-            };
-            
-            // Iniciar tentativas alternativas
-            tryNextPath(0);
+        // Função para tentar carregar o modelo
+        const tryLoadModel = (index) => {
+          if (index >= paths.length) {
+            console.error('Todos os caminhos falharam. Não foi possível carregar o modelo 14bis.');
+            return;
           }
-        );
+          
+          const path = paths[index];
+          console.log(`Tentando carregar modelo do caminho: ${path}`);
+          
+          loader.load(
+            path,
+            (gltf) => {
+              console.log('Modelo 14bis carregado com sucesso!', gltf);
+              
+              const model = gltf.scene;
+              
+              // Ajustar escala para o tamanho desejado
+              model.scale.set(1.5, 1.5, 1.5);
+              
+              // Centralizar o modelo
+              const box = new THREE.Box3().setFromObject(model);
+              const center = box.getCenter(new THREE.Vector3());
+              model.position.x = -center.x;
+              model.position.y = -center.y;
+              model.position.z = -center.z;
+              
+              // Ajustar rotação para melhor visualização
+              model.rotation.y = Math.PI / 2.5;
+              
+              scene.add(model);
+              
+              // Ajustar a câmera para enquadrar bem o modelo
+              const size = box.getSize(new THREE.Vector3());
+              const maxDim = Math.max(size.x, size.y, size.z);
+              const fov = camera.fov * (Math.PI / 180);
+              let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+              cameraZ *= 1.2;
+              
+              camera.position.set(cameraZ, cameraZ/3, cameraZ);
+              camera.lookAt(0, 0, 0);
+              
+              controls.update();
+            },
+            (progress) => {
+              console.log(`Progresso de carregamento: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+            },
+            (error) => {
+              console.error(`Falha ao carregar de [${path}]:`, error);
+              tryLoadModel(index + 1);
+            }
+          );
+        };
+        
+        // Iniciar tentativa de carregamento
+        tryLoadModel(0);
 
         // Evento de redimensionamento
         window.addEventListener('resize', () => {
@@ -1837,7 +1774,6 @@
         document.addEventListener('DOMContentLoaded', setup14Bis);
         console.log('Aguardando carregamento do DOM para iniciar o 14bis');
       } else {
-        // Se o DOM já estiver carregado (pode acontecer se o script for carregado de forma assíncrona)
         setup14Bis();
         console.log('DOM já carregado, iniciando 14bis imediatamente');
       }
