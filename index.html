@@ -1668,18 +1668,47 @@
         
         console.log('Iniciando carregamento do modelo 14bis...');
         
-        // Tentar primeiro com caminho absoluto
-        const tryModelPath = (modelPath) => {
-          console.log(`Tentando carregar modelo de: ${modelPath}`);
+        // Adicionar cubo para testar renderização
+        const testCube = new THREE.Mesh(
+          new THREE.BoxGeometry(0.5, 0.5, 0.5),
+          new THREE.MeshStandardMaterial({ color: 0xff0000 })
+        );
+        scene.add(testCube);
+        console.log('Cubo de teste adicionado para verificar renderização');
+        
+        // Lista de possíveis caminhos para tentar
+        const possiblePaths = [
+          '/models/14bis.glb',
+          'models/14bis.glb',
+          './models/14bis.glb',
+          '../models/14bis.glb',
+          '/public/models/14bis.glb',
+          'public/models/14bis.glb',
+          './public/models/14bis.glb',
+          window.location.origin + '/models/14bis.glb'
+        ];
+        
+        // Função para tentar carregar recursivamente
+        const tryLoadModel = (paths, index = 0) => {
+          if (index >= paths.length) {
+            console.error('Falha ao carregar o modelo 14bis em todos os caminhos tentados');
+            return;
+          }
+          
+          const currentPath = paths[index];
+          console.log(`Tentando carregar modelo do caminho: ${currentPath}`);
           
           loader.load(
-            modelPath, 
+            currentPath, 
             (gltf) => {
               console.log('Modelo 14bis carregado com sucesso!', gltf);
               
+              // Remove test cube once model is loaded
+              scene.remove(testCube);
+              
               const model = gltf.scene;
               
-              // Ajustar escala para o tamanho desejado - AUMENTADO SIGNIFICATIVAMENTE
+              // Ajustar escala para o tamanho desejado
               model.scale.set(1.5, 1.5, 1.5);
               
               // Centralizar o modelo
@@ -1693,39 +1722,34 @@
               model.rotation.y = Math.PI / 2.5;
               
               scene.add(model);
+              console.log('Modelo 14bis adicionado à cena');
               
-              // Ajustar a câmera para enquadrar bem o modelo com o novo tamanho
+              // Ajustar a câmera
               const size = box.getSize(new THREE.Vector3());
               const maxDim = Math.max(size.x, size.y, size.z);
               const fov = camera.fov * (Math.PI / 180);
               let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-              cameraZ *= 1.2; // Fator de zoom reduzido para aproximar a câmera
+              cameraZ *= 1.2;
               
-              // Posicionar a câmera para uma melhor visualização do modelo maior
               camera.position.set(cameraZ, cameraZ/3, cameraZ);
               camera.lookAt(0, 0, 0);
               
               controls.update();
+              console.log('Câmera ajustada para o modelo 14bis');
             },
             (progress) => {
               console.log(`Progresso de carregamento: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
             },
             (error) => {
-              console.error(`Erro ao carregar o modelo de ${modelPath}:`, error);
-              
-              // Se o caminho for relativo e falhar, tentar o caminho absoluto
-              if (modelPath === '/models/14bis.glb') {
-                console.log('Tentando caminho alternativo...');
-                tryModelPath('./models/14bis.glb');
-              } else if (modelPath === './models/14bis.glb') {
-                tryModelPath('../models/14bis.glb');
-              }
+              console.error(`Erro ao carregar o modelo de ${currentPath}:`, error);
+              // Tentar próximo caminho
+              tryLoadModel(paths, index + 1);
             }
           );
         };
         
         // Iniciar tentativa com o primeiro caminho
-        tryModelPath('/models/14bis.glb');
+        tryLoadModel(possiblePaths);
 
         // Evento de redimensionamento
         window.addEventListener('resize', () => {
