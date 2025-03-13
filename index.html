@@ -1602,18 +1602,18 @@
 
     <!-- Script para o modelo 14bis -->
     <script type="module">
-      import * as THREE from 'three';
-      import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-      import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+      const setup14Bis = async () => {
+        // Importações necessárias
+        const THREE = await import('three');
+        const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+        const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js');
 
-      // Configuração do modelo 14bis
-      const setup14Bis = () => {
         console.log('Inicializando setup do 14bis');
         
         // Canvas
         const canvas = document.querySelector('.webgl-14bis');
         if (!canvas) {
-          console.error('Canvas para 14bis não encontrado!');
+          console.error('Canvas do 14bis não encontrado');
           return;
         }
         console.log('Canvas do 14bis encontrado');
@@ -1621,6 +1621,14 @@
         // Cena
         const scene = new THREE.Scene();
         scene.background = null; // Fundo transparente
+
+        // Luzes
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
 
         // Dimensões do container
         const container = document.getElementById('model-14bis-container');
@@ -1646,14 +1654,6 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.setClearColor(0x000000, 0); // Fundo transparente
-
-        // Iluminação
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        directionalLight.position.set(1, 1, 1);
-        scene.add(directionalLight);
 
         // Controles
         const controls = new OrbitControls(camera, canvas);
@@ -1733,13 +1733,10 @@
       };
 
       // Executar quando o DOM estiver carregado
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setup14Bis);
-        console.log('Aguardando carregamento do DOM para iniciar o 14bis');
-      } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM carregado, iniciando setup do 14bis');
         setup14Bis();
-        console.log('DOM já carregado, iniciando 14bis imediatamente');
-      }
+      });
     </script>
 
   </body>
