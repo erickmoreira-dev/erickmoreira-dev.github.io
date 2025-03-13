@@ -1655,20 +1655,7 @@
         directionalLight.position.set(1, 1, 1);
         scene.add(directionalLight);
 
-        // Controles
-        const controls = new OrbitControls(camera, canvas);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enableZoom = false; // Desativar zoom para manter o tamanho
-        controls.autoRotate = true; // Rotação automática
-        controls.autoRotateSpeed = 2; // Velocidade da rotação
-        
-        // Carregador de modelo GLTF
-        const loader = new GLTFLoader();
-        
-        console.log('Iniciando carregamento do modelo 14bis...');
-        
-        // Adicionar cubo para testar renderização
+        // Geometria primitiva para garantir que a renderização está funcionando
         const testCube = new THREE.Mesh(
           new THREE.BoxGeometry(0.5, 0.5, 0.5),
           new THREE.MeshStandardMaterial({ color: 0xff0000 })
@@ -1676,34 +1663,58 @@
         scene.add(testCube);
         console.log('Cubo de teste adicionado para verificar renderização');
         
-        // Lista de possíveis caminhos para tentar
-        const possiblePaths = [
-          '/models/14bis.glb',
+        // Função de animação (inicia imediatamente para confirmar que a renderização funciona)
+        function animate() {
+          requestAnimationFrame(animate);
+          if (controls) controls.update();
+          renderer.render(scene, camera);
+        }
+        animate();
+        console.log('Animação iniciada com o cubo de teste');
+        
+        // Controles (definidos depois para evitar erro de referência no animate)
+        const controls = new OrbitControls(camera, canvas);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 2;
+        
+        // Carregador de modelo GLTF
+        const loader = new GLTFLoader();
+        
+        // Otimizado para GitHub Pages - tenta cada caminho com atraso para evitar sobrecarga
+        const tryPaths = [
+          // GitHub Pages específico (mais provável de funcionar)
           'models/14bis.glb',
           './models/14bis.glb',
+          // Caminho absoluto com origin (funciona em GitHub Pages)
+          `${window.location.origin}/models/14bis.glb`,
+          // Caminhos alternativos (menos comuns, mas possíveis)
+          '/models/14bis.glb',
           '../models/14bis.glb',
-          '/public/models/14bis.glb',
+          // Caminhos com public (desenvolvimento local)
           'public/models/14bis.glb',
-          './public/models/14bis.glb',
-          window.location.origin + '/models/14bis.glb'
+          '/public/models/14bis.glb',
+          './public/models/14bis.glb'
         ];
         
-        // Função para tentar carregar recursivamente
-        const tryLoadModel = (paths, index = 0) => {
-          if (index >= paths.length) {
-            console.error('Falha ao carregar o modelo 14bis em todos os caminhos tentados');
+        function tryNextPath(index = 0) {
+          if (index >= tryPaths.length) {
+            console.error('❌ Não foi possível carregar o modelo 14bis após tentar todos os caminhos');
+            // Manter o cubo vermelho como fallback visual
             return;
           }
           
-          const currentPath = paths[index];
-          console.log(`Tentando carregar modelo do caminho: ${currentPath}`);
+          const path = tryPaths[index];
+          console.log(`🔄 Tentando carregar o modelo 14bis de: ${path}`);
           
           loader.load(
-            currentPath, 
+            path,
             (gltf) => {
-              console.log('Modelo 14bis carregado com sucesso!', gltf);
+              console.log(`✅ Modelo 14bis carregado com sucesso de: ${path}`, gltf);
               
-              // Remove test cube once model is loaded
+              // Remove o cubo de teste
               scene.remove(testCube);
               
               const model = gltf.scene;
@@ -1722,7 +1733,7 @@
               model.rotation.y = Math.PI / 2.5;
               
               scene.add(model);
-              console.log('Modelo 14bis adicionado à cena');
+              console.log('Modelo 14bis adicionado à cena e visível');
               
               // Ajustar a câmera
               const size = box.getSize(new THREE.Vector3());
@@ -1735,22 +1746,25 @@
               camera.lookAt(0, 0, 0);
               
               controls.update();
-              console.log('Câmera ajustada para o modelo 14bis');
             },
             (progress) => {
-              console.log(`Progresso de carregamento: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+              if (progress.lengthComputable) {
+                const percentage = (progress.loaded / progress.total) * 100;
+                console.log(`📊 Progresso de carregamento do modelo (${path}): ${percentage.toFixed(1)}%`);
+              }
             },
             (error) => {
-              console.error(`Erro ao carregar o modelo de ${currentPath}:`, error);
-              // Tentar próximo caminho
-              tryLoadModel(paths, index + 1);
+              console.warn(`⚠️ Erro ao carregar o modelo de ${path}:`, error);
+              // Esperar um momento antes de tentar o próximo caminho para evitar sobrecarga
+              setTimeout(() => tryNextPath(index + 1), 100);
             }
           );
-        };
+        }
         
-        // Iniciar tentativa com o primeiro caminho
-        tryLoadModel(possiblePaths);
-
+        // Iniciar tentativa com o primeiro caminho após um pequeno atraso
+        // para garantir que a renderização já está funcionando
+        setTimeout(() => tryNextPath(0), 500);
+        
         // Evento de redimensionamento
         window.addEventListener('resize', () => {
           const container = document.getElementById('model-14bis-container');
@@ -1766,27 +1780,25 @@
           // Atualizar renderer
           renderer.setSize(width, height);
         });
-
-        // Função de animação
-        const animate = () => {
-          requestAnimationFrame(animate);
-          controls.update();
-          renderer.render(scene, camera);
-        };
-
-        animate();
-        console.log('Animação do 14bis iniciada');
       };
 
-      // Executar quando o DOM estiver carregado
+      // Executar quando o DOM estiver carregado com redundância
       if (document.readyState === 'loading') {
+        console.log('DOM ainda carregando, configurando listener para DOMContentLoaded');
         document.addEventListener('DOMContentLoaded', setup14Bis);
-        console.log('Aguardando carregamento do DOM para iniciar o 14bis');
       } else {
-        // Se o DOM já estiver carregado (pode acontecer se o script for carregado de forma assíncrona)
-        setup14Bis();
         console.log('DOM já carregado, iniciando 14bis imediatamente');
+        setup14Bis();
       }
+      
+      // Redundância - tentar novamente após 2 segundos se algo der errado
+      setTimeout(() => {
+        const canvas = document.querySelector('.webgl-14bis');
+        if (canvas && !canvas.__threeInstance) {
+          console.log('⚠️ Tentativa adicional de inicialização do 14bis após timeout');
+          setup14Bis();
+        }
+      }, 2000);
     </script>
 
   </body>
