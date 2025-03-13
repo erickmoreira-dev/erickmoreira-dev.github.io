@@ -1668,9 +1668,19 @@
         
         console.log('Iniciando carregamento do modelo 14bis...');
         
-        // Usar uma abordagem simples com caminho relativo ao host
+        // Detectar se estamos no GitHub Pages
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        console.log('Ambiente detectado:', isGitHubPages ? 'GitHub Pages' : 'Desenvolvimento local');
+        
+        // Definir caminho base de acordo com o ambiente
+        const basePath = isGitHubPages ? '' : '';
+        
+        // Tentar carregar o modelo com o caminho correto para cada ambiente
+        const modelPath = `${basePath}models/14bis.glb`;
+        console.log('Tentando carregar modelo do caminho:', modelPath);
+        
         loader.load(
-          'models/14bis.glb', 
+          modelPath, 
           (gltf) => {
             console.log('Modelo 14bis carregado com sucesso!', gltf);
             
@@ -1709,12 +1719,23 @@
           },
           (error) => {
             console.error('Erro ao carregar o modelo 14bis:', error);
+            console.error('Caminho que falhou:', modelPath);
             
             // Tentar caminhos alternativos se falhar
             console.log('Tentando caminhos alternativos...');
             
             // Array de caminhos para tentar em caso de falha
-            const alternativePaths = [
+            // Incluindo mais variações que podem funcionar no GitHub Pages
+            const alternativePaths = isGitHubPages ? [
+              './models/14bis.glb',
+              'models/14bis.glb',
+              '/models/14bis.glb',
+              '../models/14bis.glb',
+              'public/models/14bis.glb',
+              '/public/models/14bis.glb',
+              '/erickmoreira-dev.github.io/models/14bis.glb',
+              '/erickmoreira-dev.github.io/public/models/14bis.glb'
+            ] : [
               './models/14bis.glb',
               '../models/14bis.glb',
               '/models/14bis.glb',
@@ -1725,11 +1746,19 @@
             const tryNextPath = (index) => {
               if (index >= alternativePaths.length) {
                 console.error('Todos os caminhos falharam. Não foi possível carregar o modelo 14bis.');
+                
+                // Criar um cubo vermelho como substituição para mostrar onde o modelo deveria estar
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({color: 0xff0000});
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                console.log('Cubo de teste adicionado para verificar se a renderização está funcionando');
                 return;
               }
               
               const path = alternativePaths[index];
-              console.log(`Tentando caminho alternativo: ${path}`);
+              console.log(`Tentando caminho alternativo [${index+1}/${alternativePaths.length}]: ${path}`);
               
               loader.load(
                 path,
@@ -1760,8 +1789,11 @@
                   
                   controls.update();
                 },
-                undefined,
-                () => {
+                (progress) => {
+                  console.log(`Progresso de carregamento [${path}]: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+                },
+                (error) => {
+                  console.error(`Falha ao carregar de [${path}]:`, error);
                   // Se falhar, tenta o próximo caminho
                   tryNextPath(index + 1);
                 }
