@@ -1668,8 +1668,8 @@
         console.log('Ambiente detectado:', isGitHubPages ? 'GitHub Pages' : 'Desenvolvimento local');
         
         // Definir caminho base de acordo com o ambiente
-        const basePath = isGitHubPages ? '/erickmoreira-dev.github.io' : '';
-        const modelPath = `${basePath}/models/14bis.glb`;
+        const basePath = isGitHubPages ? '' : '';
+        const modelPath = `models/14bis.glb`;
         
         console.log('Tentando carregar modelo do caminho:', modelPath);
         
@@ -1714,6 +1714,50 @@
           },
           (error) => {
             console.error('Erro ao carregar modelo:', error);
+            // Tentar caminho alternativo se falhar
+            const altPath = `public/models/14bis.glb`;
+            console.log('Tentando caminho alternativo:', altPath);
+            loader.load(
+              altPath,
+              (gltf) => {
+                console.log('Modelo 14bis carregado com sucesso!', gltf);
+                
+                const model = gltf.scene;
+                
+                // Ajustar escala para o tamanho desejado
+                model.scale.set(1.5, 1.5, 1.5);
+                
+                // Centralizar o modelo
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+                
+                // Ajustar rotação para melhor visualização
+                model.rotation.y = Math.PI / 2.5;
+                
+                scene.add(model);
+                
+                // Ajustar a câmera para enquadrar bem o modelo
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const fov = camera.fov * (Math.PI / 180);
+                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                cameraZ *= 1.2;
+                
+                camera.position.set(cameraZ, cameraZ/3, cameraZ);
+                camera.lookAt(0, 0, 0);
+                
+                controls.update();
+              },
+              (progress) => {
+                console.log(`Progresso de carregamento (alt): ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+              },
+              (error) => {
+                console.error('Erro ao carregar modelo (alt):', error);
+              }
+            );
           }
         );
 
