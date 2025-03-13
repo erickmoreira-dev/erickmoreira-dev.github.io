@@ -1673,10 +1673,10 @@
         console.log('Ambiente detectado:', isGitHubPages ? 'GitHub Pages' : 'Desenvolvimento local');
         
         // Definir caminho base de acordo com o ambiente
-        const basePath = isGitHubPages ? '' : '';
+        const basePath = isGitHubPages ? '/erickmoreira-dev.github.io' : '';
         
         // Tentar carregar o modelo com o caminho correto para cada ambiente
-        const modelPath = `${basePath}models/14bis.glb`;
+        const modelPath = `${basePath}/models/14bis.glb`;
         console.log('Tentando carregar modelo do caminho:', modelPath);
         
         loader.load(
