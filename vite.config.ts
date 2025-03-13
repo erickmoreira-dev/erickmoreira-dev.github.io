@@ -3,7 +3,7 @@ import checker from "vite-plugin-checker";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/erickmoreira-dev.github.io/',
   plugins: [checker({ typescript: true })],
   worker: {},
   build: {
