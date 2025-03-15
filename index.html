@@ -1610,132 +1610,172 @@
 
         console.log('Inicializando setup do 14bis');
         
-        // Canvas
-        const canvas = document.querySelector('.webgl-14bis');
-        if (!canvas) {
-          console.error('Canvas do 14bis não encontrado');
-          return;
-        }
-        console.log('Canvas do 14bis encontrado');
-
-        // Cena
-        const scene = new THREE.Scene();
-        scene.background = null; // Fundo transparente
-
-        // Luzes
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight.position.set(5, 5, 5);
-        scene.add(directionalLight);
-
-        // Dimensões do container
-        const container = document.getElementById('model-14bis-container');
-        if (!container) {
-          console.error('Container do 14bis não encontrado!');
-          return;
-        }
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        console.log(`Dimensões do container: ${width}x${height}`);
-
-        // Câmera
-        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.set(1.5, 0.5, 1.5);
-
-        // Renderer
-        const renderer = new THREE.WebGLRenderer({
-          canvas: canvas,
-          antialias: true,
-          alpha: true
-        });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.setClearColor(0x000000, 0); // Fundo transparente
-
-        // Controles
-        const controls = new OrbitControls(camera, canvas);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enableZoom = false; // Desativar zoom para manter o tamanho
-        controls.autoRotate = true; // Rotação automática
-        controls.autoRotateSpeed = 2; // Velocidade da rotação
-        
-        // Detectar se estamos no GitHub Pages
-        const isGitHubPages = window.location.hostname.includes('github.io');
-        console.log('Ambiente detectado:', isGitHubPages ? 'GitHub Pages' : 'Desenvolvimento local');
-        
-        // Definir caminho base de acordo com o ambiente
-        const basePath = isGitHubPages ? '/' : ''; // Usa '/' no GitHub Pages
-        const modelPath = `${basePath}models/14bis.glb`;
-        
-        console.log('Tentando carregar modelo do caminho:', modelPath);
-        
-        // Carregador de modelo GLTF
-        const loader = new GLTFLoader();
-        loader.load(
-          modelPath,
-          (gltf) => {
-            console.log('Modelo 14bis carregado com sucesso!', gltf);
-            const model = gltf.scene;
-            model.scale.set(1.5, 1.5, 1.5);
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            model.position.x = -center.x;
-            model.position.y = -center.y;
-            model.position.z = -center.z;
-            model.rotation.y = Math.PI / 2.5;
-            scene.add(model);
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const fov = camera.fov * (Math.PI / 180);
-            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-            cameraZ *= 1.2;
-            camera.position.set(cameraZ, cameraZ/3, cameraZ);
-            camera.lookAt(0, 0, 0);
-            controls.update();
-          },
-          (progress) => {
-            console.log(`Progresso de carregamento: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
-          },
-          (error) => {
-            console.error('Erro ao carregar modelo:', error);
+        // Função para verificar disponibilidade do canvas
+        const checkCanvasAvailability = () => {
+          const canvas = document.querySelector('.webgl-14bis');
+          if (canvas) {
+            console.log('Canvas do 14bis encontrado, inicializando modelo');
+            initializeModel(canvas);
+          } else {
+            console.warn('Canvas do 14bis ainda não disponível, tentando novamente em 500ms');
+            setTimeout(checkCanvasAvailability, 500);
           }
-        );
+        };
+        
+        // Função de inicialização do modelo
+        const initializeModel = (canvas) => {
+          // Cena
+          const scene = new THREE.Scene();
+          scene.background = null; // Fundo transparente
 
-        // Evento de redimensionamento
-        window.addEventListener('resize', () => {
-          const container = document.getElementById('model-14bis-container');
-          if (!container) return;
+          // Luzes
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+          scene.add(ambientLight);
           
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+          directionalLight.position.set(5, 5, 5);
+          scene.add(directionalLight);
+
+          // Dimensões do container
+          const container = document.getElementById('model-14bis-container');
+          if (!container) {
+            console.error('Container do 14bis não encontrado!');
+            return;
+          }
           const width = container.clientWidth;
           const height = container.clientHeight;
+          console.log(`Dimensões do container: ${width}x${height}`);
 
-          // Atualizar câmera
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
+          // Câmera
+          const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+          camera.position.set(1.5, 0.5, 1.5);
 
-          // Atualizar renderer
+          // Renderer
+          const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+          });
           renderer.setSize(width, height);
-        });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          renderer.outputEncoding = THREE.sRGBEncoding;
+          renderer.setClearColor(0x000000, 0); // Fundo transparente
 
-        // Função de animação
-        const animate = () => {
-          requestAnimationFrame(animate);
-          controls.update();
-          renderer.render(scene, camera);
+          // Controles
+          const controls = new OrbitControls(camera, canvas);
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.05;
+          controls.enableZoom = false; // Desativar zoom para manter o tamanho
+          controls.autoRotate = true; // Rotação automática
+          controls.autoRotateSpeed = 2; // Velocidade da rotação
+          
+          // Detectar se estamos no GitHub Pages
+          const isGitHubPages = window.location.hostname.includes('github.io');
+          console.log('Ambiente detectado:', isGitHubPages ? 'GitHub Pages' : 'Desenvolvimento local');
+          
+          // Define um array de caminhos para tentar
+          const modelPaths = [
+            'models/14bis.glb',
+            '/models/14bis.glb',
+            './models/14bis.glb',
+            '/erickmoreira-dev.github.io/models/14bis.glb',
+            'erickmoreira-dev.github.io/models/14bis.glb',
+            '/public/models/14bis.glb',
+            'public/models/14bis.glb'
+          ];
+          
+          // Função para tentar carregar o modelo a partir de diferentes caminhos
+          const tryLoadModel = (pathIndex) => {
+            if (pathIndex >= modelPaths.length) {
+              console.error('Falha ao carregar o modelo a partir de todos os caminhos possíveis');
+              
+              // Criar um cubo vermelho como fallback
+              const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+              const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+              const cube = new THREE.Mesh(geometry, material);
+              scene.add(cube);
+              return;
+            }
+            
+            const currentPath = modelPaths[pathIndex];
+            console.log(`Tentando carregar modelo do caminho: ${currentPath} (tentativa ${pathIndex + 1}/${modelPaths.length})`);
+            
+            // Carregador de modelo GLTF
+            const loader = new GLTFLoader();
+            loader.load(
+              currentPath,
+              (gltf) => {
+                console.log(`Modelo 14bis carregado com sucesso do caminho: ${currentPath}`, gltf);
+                const model = gltf.scene;
+                model.scale.set(1.5, 1.5, 1.5);
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+                model.rotation.y = Math.PI / 2.5;
+                scene.add(model);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const fov = camera.fov * (Math.PI / 180);
+                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                cameraZ *= 1.2;
+                camera.position.set(cameraZ, cameraZ/3, cameraZ);
+                camera.lookAt(0, 0, 0);
+                controls.update();
+              },
+              (progress) => {
+                console.log(`Progresso de carregamento (${currentPath}): ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+              },
+              (error) => {
+                console.error(`Erro ao carregar modelo do caminho ${currentPath}:`, error);
+                // Tentar próximo caminho
+                tryLoadModel(pathIndex + 1);
+              }
+            );
+          };
+          
+          // Iniciar tentativas de carregamento do modelo
+          tryLoadModel(0);
+
+          // Evento de redimensionamento
+          window.addEventListener('resize', () => {
+            const container = document.getElementById('model-14bis-container');
+            if (!container) return;
+            
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Atualizar câmera
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            // Atualizar renderer
+            renderer.setSize(width, height);
+          });
+
+          // Função de animação
+          const animate = () => {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+          };
+
+          animate();
+          console.log('Animação do 14bis iniciada');
         };
-
-        animate();
-        console.log('Animação do 14bis iniciada');
+        
+        // Iniciar verificação de disponibilidade do canvas
+        checkCanvasAvailability();
       };
 
       // Executar quando o DOM estiver carregado
       document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM carregado, iniciando setup do 14bis');
-        setup14Bis();
+        // Pequeno delay para garantir que todos os elementos estejam carregados
+        setTimeout(() => {
+          setup14Bis();
+        }, 1000);
       });
     </script>
 
