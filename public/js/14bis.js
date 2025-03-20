@@ -118,36 +118,50 @@ document.addEventListener('DOMContentLoaded', function() {
       // Array para armazenar nuvens
       const clouds = [];
       
+      // Configurações do sistema de nuvens
+      const cloudSystem = {
+        maxClouds: 40,                // Número máximo de nuvens na cena
+        initialCount: 20,             // Número inicial de nuvens
+        spawnFrequency: 0.05,         // Frequência de criação de novas nuvens (aumentada de 0.02 para 0.05)
+        containerWidth: 30,           // Largura virtual do container para nuvens (aumentada de 25 para 30)
+        containerHeight: 25,          // Altura virtual do container para nuvens
+        widthRange: [-15, 15],        // Faixa horizontal para posicionamento das nuvens (ampliada de [-12, 12] para [-15, 15])
+        depthRange: [-12, 12],        // Faixa de profundidade para nuvens (ampliada de [-10, 10] para [-12, 12])
+        speedRange: [0.03, 0.08],     // Velocidade das nuvens (aumentada para mais movimento)
+        diagonalFactor: 0.3,          // Fator diagonal reduzido (mais horizontal, menos inclinado)
+        directionVariation: 0.15      // Variação aleatória na direção de cada nuvem
+      };
+      
       // Função para criar nuvens
-      function createCloud() {
+      function createCloud(position = null) {
         // Criar um grupo para a nuvem (várias esferas agrupadas)
         const cloudGroup = new THREE.Group();
         
-        // Material para as nuvens - branco com opacidade aumentada para mais visibilidade
+        // Material para as nuvens - mais suave e difuso
         const cloudMaterial = new THREE.MeshStandardMaterial({
           color: 0xffffff,
           transparent: true,
-          opacity: 0.85, // Aumentar opacidade para parecer mais branco
-          roughness: 0.8,
+          opacity: 0.85,
+          roughness: 0.9,
           metalness: 0.1
         });
         
         // Número de "bolinhas" para formar a nuvem - mais esferas para formato mais realista
-        const sphereCount = 8 + Math.floor(Math.random() * 6);
+        const sphereCount = 10 + Math.floor(Math.random() * 8);
         
         // Definir os tamanhos para diferentes partes da nuvem
-        const baseSize = 0.2 + Math.random() * 0.2;
+        const baseSize = 0.2 + Math.random() * 0.3;
         
-        // Criar a base da nuvem - esferas maiores no centro
-        for (let i = 0; i < 3; i++) {
+        // Criar a base da nuvem - parte inferior mais plana
+        for (let i = 0; i < 4; i++) {
           const radius = baseSize * (0.8 + Math.random() * 0.4);
           const sphere = new THREE.Mesh(
             new THREE.SphereGeometry(radius, 8, 8),
             cloudMaterial
           );
           
-          // Posicionar as esferas centrais próximas, mas não exatamente sobrepostas
-          const posX = (Math.random() - 0.5) * 0.4;
+          // Posicionar esferas lado a lado para criar a base plana
+          const posX = (i - 1.5) * baseSize * 0.8 + (Math.random() - 0.5) * 0.3;
           const posY = (Math.random() - 0.5) * 0.2;
           const posZ = (Math.random() - 0.5) * 0.4;
           sphere.position.set(posX, posY, posZ);
@@ -155,58 +169,94 @@ document.addEventListener('DOMContentLoaded', function() {
           cloudGroup.add(sphere);
         }
         
-        // Adicionar esferas menores na parte superior (visual cumulonimbus)
-        for (let i = 0; i < sphereCount - 3; i++) {
-          const isTop = i < (sphereCount - 3) / 2;
-          const radius = baseSize * (0.5 + Math.random() * 0.3);
+        // Adicionar esferas na parte superior (formato cumulonimbus)
+        for (let i = 0; i < sphereCount - 4; i++) {
+          const verticalPosition = i / (sphereCount - 4); // 0 na base, 1 no topo
+          const radius = baseSize * (1.0 - verticalPosition * 0.6); // Menor no topo
           
           const sphere = new THREE.Mesh(
-            new THREE.SphereGeometry(radius, 6, 6),
+            new THREE.SphereGeometry(radius, 7, 7),
             cloudMaterial
           );
           
           // Criar formato mais característico de nuvem:
-          // - Mais largo na parte superior
-          // - Base relativamente plana
-          let posX, posY, posZ;
-          
-          if (isTop) {
-            // Parte superior da nuvem - mais inchada e aleatória
-            posX = (Math.random() - 0.5) * baseSize * 3;
-            posY = baseSize * (0.3 + Math.random() * 0.3); // Sempre na parte superior
-            posZ = (Math.random() - 0.5) * baseSize * 3;
-          } else {
-            // Parte inferior da nuvem - mais plana
-            posX = (Math.random() - 0.5) * baseSize * 2.5;
-            posY = -baseSize * (0.1 + Math.random() * 0.3); // Sempre na parte inferior
-            posZ = (Math.random() - 0.5) * baseSize * 2.5;
-          }
+          // - Base larga
+          // - Topo mais estreito e alto
+          const posX = (Math.random() - 0.5) * baseSize * (3.0 - verticalPosition * 1.5);
+          const posY = baseSize * verticalPosition * 1.5; // Subir linearmente
+          const posZ = (Math.random() - 0.5) * baseSize * (3.0 - verticalPosition * 1.5);
           
           sphere.position.set(posX, posY, posZ);
           cloudGroup.add(sphere);
         }
         
-        // Posicionar a nuvem em algum lugar do céu
-        const distance = 6 + Math.random() * 10; // Distância da câmera
-        const angle = Math.random() * Math.PI * 2; // Ângulo aleatório em torno do modelo
+        // Adicionar alguns detalhes no topo (pequenas protuberâncias)
+        for (let i = 0; i < 3; i++) {
+          const radius = baseSize * 0.3;
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(radius, 6, 6),
+            cloudMaterial
+          );
+          
+          const angleOffset = i * (Math.PI * 2) / 3;
+          const distance = baseSize * 0.7;
+          const posX = Math.cos(angleOffset) * distance;
+          const posY = baseSize * 1.8; // Bem no topo
+          const posZ = Math.sin(angleOffset) * distance;
+          
+          sphere.position.set(posX, posY, posZ);
+          cloudGroup.add(sphere);
+        }
         
-        cloudGroup.position.x = Math.sin(angle) * distance;
-        cloudGroup.position.y = -1.5 + Math.random() * 3; // Altura variada
-        cloudGroup.position.z = Math.cos(angle) * distance;
+        // Posicionar a nuvem no espaço 3D
+        let posX, posY;
+        
+        // Se position for fornecido, usamos ele, senão geramos uma posição inicial
+        if (position === null) {
+          // Para nuvens iniciais, distribuir aleatoriamente
+          // Algumas no lado direito, outras já no caminho diagonal
+          if (Math.random() < 0.8) {  // Aumentado de 0.7 para 0.8 para mais nuvens na direita
+            // Posicionar principalmente no lado direito para entrarem na tela
+            posX = cloudSystem.widthRange[1] - Math.random() * 5; // Lado direito
+            posY = Math.random() * cloudSystem.containerHeight - cloudSystem.containerHeight/2; // Distribuir verticalmente
+          } else {
+            // Distribuir algumas ao longo do caminho diagonal
+            posX = Math.random() * cloudSystem.containerWidth - cloudSystem.containerWidth * 0.3;
+            posY = Math.random() * cloudSystem.containerHeight - cloudSystem.containerHeight * 0.3;
+          }
+        } else {
+          // Posição fornecida para novas nuvens durante a simulação
+          posX = position.x;
+          posY = position.y;
+        }
+        
+        // Posição em profundidade (Z)
+        const posZ = cloudSystem.depthRange[0] + Math.random() * 
+                    (cloudSystem.depthRange[1] - cloudSystem.depthRange[0]);
+        
+        cloudGroup.position.set(posX, posY, posZ);
         
         // Adicionar alguma rotação para variar a aparência
-        cloudGroup.rotation.x = Math.random() * Math.PI;
-        cloudGroup.rotation.y = Math.random() * Math.PI;
-        cloudGroup.rotation.z = Math.random() * Math.PI;
+        cloudGroup.rotation.x = Math.random() * Math.PI * 0.1;
+        cloudGroup.rotation.y = Math.random() * Math.PI * 2;
+        cloudGroup.rotation.z = Math.random() * Math.PI * 0.1;
         
         // Escalar a nuvem - mais variação de tamanho
-        const scale = 0.8 + Math.random() * 2.2;
-        cloudGroup.scale.set(scale, scale * 0.7, scale); // Achatamento vertical típico de nuvens
+        const scale = 0.8 + Math.random() * 1.8;
+        cloudGroup.scale.set(scale, scale * 0.6, scale); // Achatamento vertical típico de nuvens
         
         // Definir propriedades de movimento
+        const speed = cloudSystem.speedRange[0] + Math.random() * 
+                     (cloudSystem.speedRange[1] - cloudSystem.speedRange[0]);
+                     
+        // Adicionar variação individual na direção de cada nuvem
+        const directionVariation = (Math.random() * 2 - 1) * cloudSystem.directionVariation;
+        const diagonalFactor = cloudSystem.diagonalFactor * (1 + directionVariation);
+        
         cloudGroup.userData = {
-          speed: 0.01 + Math.random() * 0.02, // Velocidade variável, ligeiramente mais rápida
-          direction: new THREE.Vector3(-1, 0, 0) // Movimento da direita para a esquerda
+          speed: speed,
+          // Vetor de direção diagonal: principalmente horizontal com leve subida/descida
+          direction: new THREE.Vector3(-1, diagonalFactor, 0)
         };
         
         // Adicionar à cena e ao array de nuvens
@@ -216,8 +266,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return cloudGroup;
       }
       
-      // Criar várias nuvens
-      for (let i = 0; i < 15; i++) {
+      // Criar várias nuvens iniciais distribuídas pelo espaço
+      for (let i = 0; i < cloudSystem.initialCount; i++) {
         createCloud();
       }
       
@@ -295,15 +345,15 @@ document.addEventListener('DOMContentLoaded', function() {
               scene.remove(cube); // Remover cubo fallback
               
               model14bis = gltf.scene;
-              model14bis.scale.set(1.8, 1.8, 1.8); // Aumentado de 1.5 para 1.8
+              model14bis.scale.set(1.4, 1.4, 1.4); // Reduzido para aparecer completamente no container
               
-              // Centralizar o modelo - ajustado para ficar perfeitamente centralizado
+              // Centralizar o modelo
               const box = new THREE.Box3().setFromObject(model14bis);
               const center = box.getCenter(new THREE.Vector3());
               model14bis.position.x = -center.x;
-              model14bis.position.y = -center.y; // Removido o deslocamento para baixo (-0.2)
+              model14bis.position.y = -center.y;
               model14bis.position.z = -center.z;
-              model14bis.rotation.y = Math.PI / 2; // Ajustado de 2.5 para 2 para melhor visibilidade frontal
+              model14bis.rotation.y = Math.PI / 2; // Ajustado para melhor visibilidade frontal
               
               // Adicionar uma luz pontual diretamente acima do modelo para destacá-lo
               spotlightModel = new THREE.PointLight(0xffffee, 1.5, 10);
@@ -368,14 +418,14 @@ document.addEventListener('DOMContentLoaded', function() {
               
               scene.add(model14bis);
               
-              // Ajustar câmera com base no tamanho do modelo - zoom aumentado
+              // Ajustar câmera com base no tamanho do modelo
               const size = box.getSize(new THREE.Vector3());
               const maxDim = Math.max(size.x, size.y, size.z);
               const fov = camera.fov * (Math.PI / 180);
-              let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.0; // Reduzido de 1.2 para 0.8
+              let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.0; // Ajustado para mostrar todo o modelo
               
-              // Posicionar a câmera mais próxima e centralizada no modelo
-              camera.position.set(cameraZ * 0.8, cameraZ/3, cameraZ * 0.8); // Reduzido x e z de 0.8 para 0.7, y de 1/3 para 1/4
+              // Posicionar a câmera mais afastada para mostrar todo o modelo
+              camera.position.set(cameraZ * 0.9, cameraZ * 0.4, cameraZ * 0.9);
               camera.lookAt(new THREE.Vector3(0, 0, 0)); // Garantir que a câmera olhe para o centro exato
               
               // Atualizar controles para o novo centro após configurar a câmera
@@ -415,34 +465,42 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Função para mover nuvens e reposicioná-las
       function updateClouds() {
-        // Adicionar novas nuvens ocasionalmente
-        if (Math.random() < 0.005 && clouds.length < 25) {
-          const newCloud = createCloud();
-          // Posicionar novas nuvens no lado direito
-          newCloud.position.x = 15 + Math.random() * 5;
+        // Adicionar novas nuvens com frequência regular, principalmente do lado direito
+        if (Math.random() < cloudSystem.spawnFrequency && clouds.length < cloudSystem.maxClouds) {
+          // Criar nova nuvem no lado direito, com altura variável
+          const startPosition = {
+            x: cloudSystem.widthRange[1] + 2, // Bem na direita, fora da tela mas próximo da borda
+            y: -cloudSystem.containerHeight/2 + Math.random() * cloudSystem.containerHeight // Altura variável
+          };
+          const newCloud = createCloud(startPosition);
         }
         
         // Atualizar posição das nuvens
         for (let i = 0; i < clouds.length; i++) {
           const cloud = clouds[i];
           
-          // Mover a nuvem principalmente horizontalmente (da direita para esquerda)
-          cloud.position.x -= cloud.userData.speed;
+          // Mover a nuvem seguindo sua direção individual
+          const direction = cloud.userData.direction.clone().normalize();
+          cloud.position.x += direction.x * cloud.userData.speed;
+          cloud.position.y += direction.y * cloud.userData.speed;
           
-          // Adicionar leve movimento vertical aleatório
-          cloud.position.y += Math.sin(Date.now() * 0.0005 + i) * 0.002;
+          // Adicionar muito sutil movimento de flutuação vertical (como nuvens reais)
+          cloud.position.y += Math.sin(Date.now() * 0.0002 + i * 3.14) * 0.001;
           
-          // Se a nuvem saiu da tela, reposicioná-la do outro lado
-          if (cloud.position.x < -15) {
+          // Adicionar leve movimento ondulante perpendicular à direção principal
+          cloud.position.z += Math.sin(Date.now() * 0.0003 + i) * 0.002;
+          
+          // Se a nuvem saiu da tela pela esquerda, removê-la
+          if (cloud.position.x < -cloudSystem.containerWidth - 5) {
             // Remover da cena e do array
             scene.remove(cloud);
             clouds.splice(i, 1);
-            i--; // Ajustar índice
+            i--; // Ajustar índice após remoção
           }
         }
       }
       
-      // Função para animar o modelo do 14bis - movimento mais vívido e realista
+      // Função para animar o modelo do 14bis
       function updateModel() {
         if (model14bis) {
           const userData = model14bis.userData;
