@@ -263,6 +263,7 @@
       .keep-visible {
         opacity: 1 !important;
         transform: translateY(0) !important;
+        visibility: visible !important;
         transition: opacity 0.3s ease, transform 0.3s ease;
       }
 
@@ -415,17 +416,19 @@
           Além do meu amor por tecnologia e design, também me interesso
           por games e astronomia.
         </p>
-        
-        <div class="based-info">
-          <p><svg width="16" height="16" viewBox="0 0 384 512" style="margin-right: 5px; fill: currentColor;">
-            <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
-          </svg> Santos Dumont - Minas Gerais, Brasil<span id="model-14bis-container" class="model-container"><canvas class="webgl-14bis"></canvas></span></p>
-        </div>
-
-        <p>
-          Abaixo estão os detalhes de alguns dos projetos que desenvolvi.
-        </p>
       </section>
+
+      <div class="based-info" style="margin-bottom: 40px; margin-top: 40px;">
+        <p style="display: flex; align-items: center; justify-content: center; margin: 0; gap: 15px;">
+          <span style="display: flex; align-items: center;">
+            <svg width="16" height="16" viewBox="0 0 384 512" style="margin-right: 5px; fill: currentColor;">
+              <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+            </svg> 
+            Santos Dumont - Minas Gerais, Brasil
+          </span>
+          <span id="model-14bis-container" class="model-container"><canvas class="webgl-14bis"></canvas></span>
+        </p>
+      </div>
 
       <section>
         <h1 id="projects">Projetos</h1>
@@ -641,7 +644,7 @@
         </h1>
         
         <!-- Mensagem animada vinculada ao LinkedIn -->
-        <div id="linkedin-container" style="position: relative; text-align: center; margin: 20px auto 40px; width: 100%; max-width: 400px; cursor: pointer; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease;"
+        <div id="linkedin-container" style="position: relative; text-align: center; margin: 20px auto 40px; width: 100%; max-width: 400px; cursor: pointer; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; visibility: hidden;"
           onclick="window.open('https://www.linkedin.com/in/erick-moreira-112b3819b/', '_blank')">
           <div id="animated-linkedin-message" style="display: inline-block; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 240, 0.95)); 
             padding: 12px 22px; border-radius: 10px; font-size: 18px; font-weight: bold; 
@@ -804,15 +807,22 @@
     </button>
 
     <script>
-      // Mostrar botão de tradução depois que sair da tela do PC
+      // Variável para rastrear se o botão já foi mostrado
+      let translateBtnShown = false;
+
+      // Mostrar botão de tradução quando chegar na seção sobre (aboutMe) e mantê-lo visível depois
       window.addEventListener('scroll', function() {
-        const computerScreen = document.querySelector('.webgl');
         const translateBtn = document.getElementById('translate-btn');
+        const aboutSection = document.getElementById('aboutMe');
         
-        if (window.scrollY > window.innerHeight) {
-          translateBtn.style.display = 'flex';
-        } else {
-          translateBtn.style.display = 'none';
+        if (translateBtn && aboutSection && !translateBtnShown) {
+          const aboutRect = aboutSection.getBoundingClientRect();
+          
+          // Verifica se a seção "sobre" está ou já esteve visível na tela
+          if (aboutRect.top < window.innerHeight && aboutRect.bottom > 0) {
+            translateBtn.style.display = 'flex';
+            translateBtnShown = true; // Marca que o botão já foi mostrado
+          }
         }
       });
 
@@ -1645,6 +1655,7 @@
                         console.log("Iniciando animação do LinkedIn após remontagem do GameBoy");
                         
                         // Mostrar o container com animação de fade in
+                        linkedinContainer.style.visibility = "visible";
                         linkedinContainer.style.opacity = "1";
                         linkedinContainer.style.transform = "translateY(0)";
                         
@@ -1666,10 +1677,11 @@
                           
                           // Garantir que a mensagem permaneça visível após a animação
                           setTimeout(() => {
+                            linkedinContainer.classList.add('keep-visible');
                             linkedinContainer.style.opacity = "1";
                             linkedinContainer.style.transform = "translateY(0)";
-                            linkedinContainer.classList.add('keep-visible'); // Adicionar classe que mantém visível
-                          }, text.length * 50 + 500); // Diminuir para que a garantia seja aplicada mais rapidamente após a digitação
+                            linkedinContainer.style.visibility = "visible";
+                          }, text.length * 50 + 500);
                         }, 300);
                       }
                     }, 3000); // Aumentado para 3 segundos para garantir que o GameBoy esteja completamente montado
@@ -1684,13 +1696,8 @@
                   entry.target.gameboy.updateExplodeButtonText();
                 }
                 
-                // Garantir que o LinkedIn seja mostrado mesmo sem a animação do GameBoy
-                if (linkedinContainer && !entry.target.hasPlayedLinkedinAnimation) {
-                  entry.target.hasPlayedLinkedinAnimation = true;
-                  linkedinContainer.style.opacity = "1";
-                  linkedinContainer.style.transform = "translateY(0)";
-                  linkedinContainer.classList.add('keep-visible'); // Adicionar classe que mantém visível
-                }
+                // NÃO mostrar automaticamente o LinkedIn - vamos esperar a animação do GameBoy
+                // Mantemos o LinkedIn oculto até a animação de explosão/reassemblagem do GameBoy
               }
             }
           } else {
@@ -1730,59 +1737,11 @@
     <!-- Script para o modelo 14bis -->
     <script src="js/14bis.js"></script>
 
-    <button id="translateBtn" class="translate-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-      </svg>
-      Translate
-    </button>
-
     <script>
       // Garantir que a mensagem do LinkedIn seja exibida corretamente
       document.addEventListener('DOMContentLoaded', function() {
-        // Função para garantir que a mensagem do LinkedIn fique visível
-        function ensureLinkedInVisibility() {
-          const linkedinContainer = document.getElementById('linkedin-container');
-          const contactSection = document.getElementById('contact-section');
-          
-          if (linkedinContainer && contactSection) {
-            // Verificar se a seção de contato está visível
-            const rect = contactSection.getBoundingClientRect();
-            const isVisible = (
-              rect.top >= 0 &&
-              rect.left >= 0 &&
-              rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-              rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-            );
-            
-            if (isVisible) {
-              // Garantir que a mensagem esteja visível
-              setTimeout(() => {
-                linkedinContainer.classList.add('keep-visible');
-                linkedinContainer.style.opacity = "1";
-                linkedinContainer.style.transform = "translateY(0)";
-                console.log("Verificação secundária: garantindo visibilidade do LinkedIn");
-              }, 10000); // Tempo suficiente para toda a sequência de animação
-            }
-          }
-        }
-        
-        // Observar rolagem da página
-        window.addEventListener('scroll', ensureLinkedInVisibility);
-        
-        // Verificar visibilidade inicial
-        setTimeout(ensureLinkedInVisibility, 2000);
-        
-        // Backup para garantir visibilidade independente de animações
-        setTimeout(() => {
-          const linkedinContainer = document.getElementById('linkedin-container');
-          if (linkedinContainer) {
-            linkedinContainer.classList.add('keep-visible');
-            linkedinContainer.style.opacity = "1";
-            linkedinContainer.style.transform = "translateY(0)";
-            console.log("Backup final: garantindo visibilidade do LinkedIn");
-          }
-        }, 15000); // 15 segundos é tempo suficiente para toda a sequência
+        // Remover as verificações automáticas de backup que mostram o LinkedIn independentemente da animação do GameBoy
+        // Vamos depender apenas da animação que ocorre após a remontagem do GameBoy
       });
     </script>
   </body>
